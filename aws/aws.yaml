@@ -1,0 +1,11 @@
+version: 1.0
+provider:
+  name: openfaas
+  gateway: http://localhost:8080
+functions:
+  action-store-aws:
+    lang: runner-template-python3
+    handler: ./action-store-aws
+    image: kubiya/action-store-aws:latest
+    annotations:
+        topic: "aws"
