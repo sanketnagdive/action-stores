@@ -6,7 +6,7 @@ functions:
   kubernetes:
     lang: runner-template-python3
     handler: ./kubernetes
-    image: 564407622114.dkr.ecr.eu-west-1.amazonaws.com/runner-kubernetes:latest
+    image: kubiya/action-store-k8s:latest
     annotations:
         topic: "kubernetes"
-        com.openfaas.serviceaccount: fn-events
+        com.openfaas.serviceaccount: default
