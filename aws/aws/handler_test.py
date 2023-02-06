@@ -2,6 +2,7 @@ import json
 
 import boto3
 import moto
+
 from aws.main_store import SQS, action_store
 
 # Test your handler here
@@ -98,6 +99,5 @@ def test_add_single_message_to_queue():
     assert output
     action_metadata = action_store._action_metadata["receive_sqs_messages"]
     assert action_metadata["category"] == "sqs"
-    
 
     # output = action_store.execute_action("add_single_message_to_queue", {"queue_name": "test-queue", "message": output[0].__dict__)
