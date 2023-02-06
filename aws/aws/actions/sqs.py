@@ -6,6 +6,7 @@ from pydantic import BaseModel
 
 from . import action_store
 
+
 class SQS(BaseModel):
     """follows model with attributes of sqs queue for boto3"""
 
@@ -94,7 +95,6 @@ def return_sqs_messages_to_queue(sqs: SQS):
                 return "Message ID not found"
         else:
             return "No messages in the queue"
-        return "OK"
     except boto3.exceptions.botocore.exceptions.ClientError as e:
         return e.response
 

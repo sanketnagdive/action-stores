@@ -2,7 +2,22 @@ import json
 
 import boto3
 import moto
-from aws.main_store import SQS, action_store
+from unittest import mock
+import pytest
+import os
+
+
+@pytest.fixture(scope="module")
+def aws_credentials():
+    """Mocked AWS Credentials for moto."""
+    os.environ["AWS_ACCESS_KEY_ID"] = "testing"
+    os.environ["AWS_SECRET_ACCESS_KEY"] = "testing"
+    os.environ["AWS_SECURITY_TOKEN"] = "testing"
+    os.environ["AWS_SESSION_TOKEN"] = "testing"
+    os.environ["AWS_DEFAULT_REGION"] = "us-east-1"
+
+with mock.patch("aws.actions.generics.boto3", moto) as mock_boto3:
+    from aws.main_store import SQS, action_store
 
 # Test your handler here
 
@@ -59,7 +74,7 @@ def test_list_queues():
     assert len(output) == 1
     action_metadata = action_store._action_metadata["receive_sqs_messages"]
     assert action_metadata["category"] == "sqs"
-    assert output[0].startswith("https://sqs.us-east-1.amazonaws.com/")
+    assert output[0].startswith("https://queue.amazonaws.com/")
 
 
 def test_receive_messages():
@@ -98,6 +113,17 @@ def test_add_single_message_to_queue():
     assert output
     action_metadata = action_store._action_metadata["receive_sqs_messages"]
     assert action_metadata["category"] == "sqs"
-    
 
     # output = action_store.execute_action("add_single_message_to_queue", {"queue_name": "test-queue", "message": output[0].__dict__)
+
+def test_generic(aws_credentials):
+    _mock_secrets(action_store)
+
+    with mock.patch("aws.actions.generics.boto3", moto) as mock_boto3:
+        from aws.main_store import SQS, action_store
+    
+    output = action_store.execute_action("ecs.ListClusters", {})
+    
+    assert output
+    
+    
