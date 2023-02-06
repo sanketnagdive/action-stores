@@ -60,7 +60,7 @@ def test_list_queues():
     assert len(output) == 1
     action_metadata = action_store._action_metadata["receive_sqs_messages"]
     assert action_metadata["category"] == "sqs"
-    assert output[0].startswith("https://sqs.us-east-1.amazonaws.com/")
+    assert output[0].startswith("https://queue.amazonaws.com/")
 
 
 def test_receive_messages():
