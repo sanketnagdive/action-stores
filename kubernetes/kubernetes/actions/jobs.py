@@ -106,13 +106,17 @@ def create_namespaced_job(job: Job):
 def get_namespaced_job_logs(job: Job):
     try:
         core_api_client = get_core_api_client()
-
-        label_selector = f"job-name={job.job_name}"
-        pod_list = core_api_client.list_namespaced_pod(
-            job.namespace, label_selector=label_selector
-        )
+        while True:
+            label_selector = f"job-name={job.job_name}"
+            pod_list = core_api_client.list_namespaced_pod(
+                job.namespace, label_selector=label_selector
+            )
+            if len(pod_list.items) > 0:
+                break
+            time.sleep(1)
         pod_name = pod_list.items[0].metadata.name
         logging.info(f"Found pod:{pod_name}")
+            
 
         while True:
             pod = core_api_client.read_namespaced_pod(pod_name, job.namespace)
