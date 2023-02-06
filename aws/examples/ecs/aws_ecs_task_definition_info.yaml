@@ -1,0 +1,29 @@
+version: 3
+type: conversation
+steps:
+  - id: get_task_definitions
+    type: action
+    action:
+      runner: "<some-runner>"
+      store: aws
+      name: "ecs.ListTaskDefinitions"
+      parameters: {}
+  - id: task_definitions
+    type: jq
+    jq: .get_task_definitions.taskDefinitionArns[] | split("/")[-1]
+  - id: task_definition
+    type: input
+    value_type: enum
+    prompt: "Select the task definition you want to see details for"
+    possible_values: ${task_definitions}
+  - id: get_task_definition
+    type: action
+    action:
+      runner: "<some-runner>"
+      store: aws
+      name: "ecs.DescribeTaskDefinition"
+      parameters:
+        taskDefinition: ${task_definition}
+  - id: task_definition_details
+    type: json_message
+    prompt: ${get_task_definition}
