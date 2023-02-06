@@ -5,7 +5,7 @@ provider:
 functions:
   action-store-aws:
     lang: runner-template-python3
-    handler: ./action-store-aws
+    handler: ./aws
     image: kubiya/action-store-aws:latest
     annotations:
         topic: "aws"
