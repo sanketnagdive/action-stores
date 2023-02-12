@@ -1,0 +1,10 @@
+version: 1.0
+provider:
+  name: openfaas
+  gateway: http://localhost:8080
+functions:
+  teststore:
+    lang: runner-template-python3
+    handler: ./teststore
+    image: teststore:latest
+
