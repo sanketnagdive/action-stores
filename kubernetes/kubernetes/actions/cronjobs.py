@@ -37,7 +37,6 @@ def list_disabled_cronjobs_for_all_namespaces(args):
     ]
 
 
-
 @action_store.kubiya_action()
 def delete_stuck_cronjob(args):
     api_client = get_batch_client()
