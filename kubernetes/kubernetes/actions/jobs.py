@@ -3,17 +3,20 @@ import logging
 import os
 import time
 from datetime import timedelta
-from typing import Any, Dict, Optional, Union
+from typing import Dict, Optional
 
-import requests
 from pydantic import BaseModel
 
-import kubernetes
-from kubernetes import client, config
-from kubernetes.client import (V1Container, V1EnvVar, V1Job, V1JobSpec,
-                               V1ObjectMeta, V1PodSpec, V1PodTemplateSpec)
+from kubernetes.client import (
+    V1Container,
+    V1EnvVar,
+    V1Job,
+    V1JobSpec,
+    V1ObjectMeta,
+    V1PodSpec,
+    V1PodTemplateSpec,
+)
 from kubernetes.client.rest import ApiException
-from kubernetes.stream import stream
 
 from . import actionstore as action_store
 from .clients import get_batch_client, get_core_api_client
@@ -52,8 +55,6 @@ def create_namespaced_job(job: Job):
         env=[V1EnvVar(name=k, value=v) for k, v in job.env_vars.items()],
     )
 
-    # Create the specification of deployment
-    # Restart policy is set to Never, so that the pod will not be restarted in case of failure
     job_spec = V1JobSpec(
         template=V1PodTemplateSpec(
             metadata=V1ObjectMeta(labels={"app": job.app_label}),
@@ -116,7 +117,6 @@ def get_namespaced_job_logs(job: Job):
             time.sleep(1)
         pod_name = pod_list.items[0].metadata.name
         logging.info(f"Found pod:{pod_name}")
-            
 
         while True:
             pod = core_api_client.read_namespaced_pod(pod_name, job.namespace)

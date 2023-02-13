@@ -1,1 +1,1 @@
-from .actions import actionstore, jobs, pods, namespace, deployment
+from .actions import actionstore, jobs, pods, namespace, deployment, cronjobs
