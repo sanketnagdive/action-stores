@@ -4,6 +4,7 @@ from pydantic import BaseModel
 
 from kubernetes import client
 
+
 from . import actionstore as action_store, clients
 
 
@@ -26,7 +27,7 @@ def create_namespaced_pod(namespaced_pod: NamespacedPod):
     """creates a namespaced pod"""
     try:
         core_api = client.CoreV1Api()
-        pod = kubernetes.client.V1Pod(
+        pod = client.V1Pod(
             api_version="v1",
             kind="Pod",
             metadata=client.V1ObjectMeta(name=namespaced_pod.pod_name),
@@ -144,6 +145,7 @@ def get_running_pods(args):
             field_selector="status.phase=Running"
         )
 
-        pod = [item for item in api_response.items]
+        pods = [item.metadata.name for item in api_response.items]
+        return pods
     except client.rest.ApiException as e:
         return {"error": e.reason}
