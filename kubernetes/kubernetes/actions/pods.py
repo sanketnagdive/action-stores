@@ -134,3 +134,16 @@ def retreive_image_tag_for_pod(input_pod: Pod):
         return pod[0].spec.containers[0].image.split(":")[1]
     except client.rest.ApiException as e:
         return {"error": e.reason}
+
+
+@action_store.kubiya_action()
+def get_running_pods(args):
+    try:
+        api_client = clients.get_core_api_client()
+        api_response = api_client.list_pod_for_all_namespaces(
+            field_selector="status.phase=Running"
+        )
+
+        pod = [item for item in api_response.items]
+    except client.rest.ApiException as e:
+        return {"error": e.reason}

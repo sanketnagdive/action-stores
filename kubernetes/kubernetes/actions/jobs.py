@@ -128,12 +128,3 @@ def get_namespaced_job_logs(job: Job):
         raise Exception(
             f"Exception when calling BatchV1Api->create_namespaced_job: {e}"
         )
-
-
-@action_store.kubiya_action()
-def get_running_pods(params):
-    api_client = get_core_api_client()
-    api_response = api_client.list_namespaced_pod(
-        namespace="zenapi", field_selector="status.phase=Running"
-    )
-    return [item.metadata.name for item in api_response.items]
