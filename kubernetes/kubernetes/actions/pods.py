@@ -90,3 +90,32 @@ def read_namespaced_pod(namespaced_pod: NamespacedPod):
 #     api_response = api_client.list_pod_for_all_namespaces(field_selector=field_selector)
 #     return [item.metadata.name for item in api_response.items]
 
+
+
+
+
+@action_store.kubiya_action()
+def list_failed_pods(params):
+    """"Kubernetes AS - Show logs for a pod that is in degraded state"""
+    api_client = clients.get_core_api_client()
+    field_selector = "status.phase=Failed"
+    api_response = api_client.list_pod_for_all_namespaces(field_selector=field_selector)
+    return [item.metadata.name for item in api_response.items]
+
+@action_store.kubiya_action()
+def list_pods(params):
+    """Kubernetes AS - List pods"""
+    api_client = clients.get_core_api_client()
+    api_response = api_client.list_pod_for_all_namespaces()
+    return [item.metadata.name for item in api_response.items]
+
+
+
+@action_store.kubiya_action()
+def get_zenapi(params):
+    # kubectl -n zenapi get pods --field-selector=status.phase=Running
+    api_client = clients.get_core_api_client()
+    field_selector = "status.phase=Running"
+    api_response = api_client.list_pod_for_all_namespaces(field_selector=field_selector)
+    return [item.metadata.name for item in api_response.items]
+
