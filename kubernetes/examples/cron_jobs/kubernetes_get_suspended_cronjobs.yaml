@@ -1,0 +1,28 @@
+version: 3
+type: conversation
+name: "kubernetes_get_suspended_cronjobs"
+steps:
+  - id: notify
+    type: message
+    prompt: "Getting suspended cron jobs.."
+  - id: cron_jobs
+    type: action
+    action:
+      runner: "demo"
+      store: kubernetes
+      name: "list_suspended_cronjobs"
+      parameters: {}
+  - id: check_if_no_jobs
+    type: condition
+    if:
+      arg: ${cron_jobs}
+      is: equals
+      arg2: '[]' # Empty
+      then:
+        - id: notify_no_jobs_found
+          type: message
+          prompt: "No suspended cron jobs found"
+      else:
+        - id: print_suspended_jobs
+          type: json_message
+          prompt: "${cron_jobs}"
