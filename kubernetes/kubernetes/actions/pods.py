@@ -92,12 +92,6 @@ def read_namespaced_pod(namespaced_pod: NamespacedPod):
         return {"error": e.reason}
 
 
-# @action_store.kubiya_action()
-# def list_failed_pods(params):
-#     api_client = clients.get_core_api_client()
-#     field_selector = "status.phase=Failed"
-#     api_response = api_client.list_pod_for_all_namespaces(field_selector=field_selector)
-#     return [item.metadata.name for item in api_response.items]
 
 
 @action_store.kubiya_action()
