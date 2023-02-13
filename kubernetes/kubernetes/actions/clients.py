@@ -19,8 +19,10 @@ client_config.ssl_ca_cert = "/var/run/secrets/kubernetes.io/serviceaccount/ca.cr
 def get_batch_client():
     return kubernetes.client.BatchV1Api(kubernetes.client.ApiClient(client_config))
 
+
 def get_apps_client():
     return kubernetes.client.AppsV1Api(kubernetes.client.ApiClient(client_config))
+
 
 def get_core_api_client():
     return kubernetes.client.CoreV1Api(kubernetes.client.ApiClient(client_config))
