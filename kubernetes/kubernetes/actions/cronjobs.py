@@ -37,23 +37,6 @@ def list_disabled_cronjobs_for_all_namespaces(args):
     ]
 
 
-@action_store.kubiya_action()
-def list_disabled_cronjobs_for_namespace(args):
-    api_client = get_batch_client()
-    api_response = api_client.list_cron_job_for_all_namespaces()
-    return [
-        item.metadata.name for item in api_response.items if item.spec.schedule == ""
-    ]
-
-
-@action_store.kubiya_action()
-def list_disabled_cronjobs(args):
-    api_client = get_batch_client()
-    api_response = api_client.list_cron_job_for_all_namespaces()
-    return [
-        item.metadata.name for item in api_response.items if item.spec.schedule == ""
-    ]
-
 
 @action_store.kubiya_action()
 def delete_stuck_cronjob(args):
