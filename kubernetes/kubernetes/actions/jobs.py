@@ -5,7 +5,6 @@ from datetime import timedelta
 from typing import Any, Dict, Optional
 from lightkube.resources.core_v1 import Pod
 from lightkube.resources import batch_v1 
-import requests
 from pydantic import BaseModel
 
 import kubernetes
