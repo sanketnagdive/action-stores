@@ -4,6 +4,9 @@ import os
 import time
 from datetime import timedelta
 from typing import Any, Dict, Optional, Union
+from lightkube import Client
+from lightkube import generic_resource
+from lightkube.resources.core_v1 import Pod
 
 import requests
 from pydantic import BaseModel
@@ -20,7 +23,6 @@ from .clients import get_batch_client, get_core_api_client
 
 logging.basicConfig(level=logging.INFO)
 
-
 class Job(BaseModel):
     name: str
     image: str
@@ -35,6 +37,7 @@ class Job(BaseModel):
     env_vars: Optional[Dict[str, str]] = None
     app_label: str = "example-app"
     restart_policy: str = "Never"
+    backoff_limit: int = 4
 
 
 @action_store.kubiya_action()
@@ -46,9 +49,16 @@ def create_namespaced_job(job: Job):
     logging.info("Attempting to create namespaced job")
     if not job.env_vars:
         job.env_vars = {"EXAMPLE_ENV_VAR": "example-value"}
+    
+    cmd = job.command
+    if cmd:
+        cmd = [part.strip() for part in job.command.split(",")]
+    logging.info("cmd is {}".format(cmd))
+
     container = V1Container(
         name=job.container_name,
         image=job.image,
+        command=cmd,
         env=[V1EnvVar(name=k, value=v) for k, v in job.env_vars.items()],
     )
 
@@ -63,7 +73,7 @@ def create_namespaced_job(job: Job):
                 restart_policy=job.restart_policy,
             ),
         ),
-        backoff_limit=4,
+        backoff_limit=job.backoff_limit,
     )
 
     # Create the job
@@ -74,57 +84,66 @@ def create_namespaced_job(job: Job):
         spec=job_spec,
     )
     try:
-        api_response = api_client.create_namespaced_job(
+        ret = api_client.create_namespaced_job(
             namespace=job.namespace, body=new_job
         )
-        logging.info(f"Job created. response='{str(api_response)}")
+        return ret.to_dict()
+        
     except ApiException as e:
         # create a meaningful error message
         raise ApiException(
             f"Exception when calling BatchV1Api->create_namespaced_job: {e.body}"
         )
         # In case the job succeeded to start, get its logs
-    try:
-        # Wait for the job to launch a pod
-        while datetime.datetime.now() < timeout_time:
-            logging.info("Waiting for job to start")
-            api_response = api_client.read_namespaced_job(job.job_name, job.namespace)
-            # Get the pod name from the job
-            logging.info(f"current status: {api_response}")
-
-            if api_response.status.active not in [None, 0]:
-                return {"status": api_response.status.active}
-            time.sleep(1.5)
-
-    except ApiException as e:
+   
         raise ApiException(
             f"Exception when calling BatchV1Api->read_namespaced_job: {e.body}"
         )
 
+@action_store.kubiya_action()
+def get_pods(job: Job):
+    try:
+        client = Client()
+        return [
+            pod.to_dict()
+            for pod in client.list(Pod, namespace=job.namespace, labels={"job-name": job.name})
+        ]
+        
+    except Exception as e:
+        raise Exception(f"Exception when calling get_pod_for_job: {e.body}")
+
+
+
+Job = generic_resource.create_namespaced_resource('jobs.batch', 'v1', 'Job', 'jobs')
+@action_store.kubiya_action()
+def get_pods_status(job: Job):
+    try:
+        client = Client()
+        return [
+            pod.status.phase
+            for pod in client.list(Pod, namespace=job.namespace, labels={"job-name": job.name})
+        ]
+     
+    except Exception as e:
+        raise Exception(f"Exception when calling get_pod_for_job: {e.body}")  
 
 @action_store.kubiya_action()
-def get_namespaced_job_logs(job: Job):
+def get_job_logs(job: Job):
+    client = Client()
     try:
-        core_api_client = get_core_api_client()
-        while True:
-            label_selector = f"job-name={job.job_name}"
-            pod_list = core_api_client.list_namespaced_pod(
-                job.namespace, label_selector=label_selector
-            )
-            if len(pod_list.items) > 0:
-                break
-            time.sleep(1)
-        pod_name = pod_list.items[0].metadata.name
-        logging.info(f"Found pod:{pod_name}")
-            
-
-        while True:
-            pod = core_api_client.read_namespaced_pod(pod_name, job.namespace)
-            if pod.status.phase != "Pending":
-                logs = core_api_client.read_namespaced_pod_log(pod_name, job.namespace)
-                return logs.splitlines()
-            time.sleep(1)
+        podnames = [
+            pod.metadata.nameec
+            for pod in client.list(Pod, namespace=job.namespace, labels={"job-name": job.name})
+        ]
+        if len(podnames) == 0:
+            return {"status": "No pods found"}
+        return {
+            podname: "".join(client.log(name=podname, namespace=job.namespace))
+            for podname in podnames
+        }
+          
     except Exception as e:
         raise Exception(
             f"Exception when calling BatchV1Api->create_namespaced_job: {e}"
         )
+
