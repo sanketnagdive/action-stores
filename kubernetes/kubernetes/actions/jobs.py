@@ -1,13 +1,10 @@
 import datetime
 import logging
-import os
-import time
-from datetime import timedelta
-from typing import Any, Dict, Optional, Union
-from lightkube import Client, KubeConfig
-from lightkube import generic_resource
-from lightkube.resources.core_v1 import Pod
 
+from datetime import timedelta
+from typing import Any, Dict, Optional
+from lightkube.resources.core_v1 import Pod
+from lightkube.resources import batch_v1 
 import requests
 from pydantic import BaseModel
 
@@ -108,24 +105,80 @@ def get_pods(job: Job):
             pod.to_dict()
             for pod in client.list(Pod, namespace=job.namespace, labels={"job-name": job.name})
         ]
-        
-    except Exception as e:
-        raise Exception(f"Exception when calling get_pod_for_job: {e.body}")
-
-
+    except ApiException as e:
+        raise ApiException(
+            e.msg
+        )
 
 @action_store.kubiya_action()
-def get_pods_status(job: Job):
+def get_job_data(job: Job):
+    try:
+        client = get_lightkube_client()
+        return client.list(batch_v1.Job, name=job.name, namespace=job.namespace).to_dict()
+    except ApiException as e:
+        raise ApiException(
+            e.msg
+        )
+    
+@action_store.kubiya_action()
+def get_job_per_pod_status(job: Job):
     try:
         client = get_lightkube_client()
         return [
             pod.status.phase
             for pod in client.list(Pod, namespace=job.namespace, labels={"job-name": job.name})
         ]
-     
-    except Exception as e:
-        raise Exception(f"Exception when calling get_pod_for_job: {e.body}")  
+    except ApiException as e:
+        raise ApiException(
+            e.msg
+        )
 
+@action_store.kubiya_action()
+def list_job_names(job: Job):
+    try:
+        client = get_lightkube_client()
+        return [
+            job.metadata.name
+            for job in client.list(
+                batch_v1.Job, namespace=job.namespace
+            )
+        ]
+    except ApiException as e:
+        raise ApiException(
+            e.msg
+        )
+   
+@action_store.kubiya_action()
+def get_job_status(job: Job):
+    client = get_lightkube_client()
+    return client.get(batch_v1.Job, name=job.name, namespace=job.namespace).status.conditions[-1].type
+
+@action_store.kubiya_action()
+def list_job_statuses(job: Job):
+    try:
+        client = get_lightkube_client()
+        return {
+        job.metadata.name: job.status.conditions[-1].type
+        for job in client.list(batch_v1.Job, namespace=job.namespace)
+    }
+    except ApiException as e:
+        raise ApiException(
+            e.msg
+        )
+        
+@action_store.kubiya_action()
+def delete_job(job: Job):
+    try:
+        client = get_lightkube_client()
+        client.delete(
+            batch_v1.Job, name=job.name, namespace=job.namespace
+        )
+        return True
+    except ApiException as e:
+        raise ApiException(
+            e.msg
+        )
+    
 @action_store.kubiya_action()
 def get_job_logs(job: Job):
     try:
@@ -140,9 +193,7 @@ def get_job_logs(job: Job):
             podname: "".join(client.log(name=podname, namespace=job.namespace))
             for podname in podnames
         }
-          
-    except Exception as e:
-        raise Exception(
-            f"Exception when calling BatchV1Api->create_namespaced_job: {e}"
+    except ApiException as e:
+        raise ApiException(
+            e.msg
         )
-
