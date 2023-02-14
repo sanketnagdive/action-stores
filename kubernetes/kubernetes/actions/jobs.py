@@ -4,7 +4,7 @@ import os
 import time
 from datetime import timedelta
 from typing import Any, Dict, Optional, Union
-from lightkube import Client
+from lightkube import Client, KubeConfig
 from lightkube import generic_resource
 from lightkube.resources.core_v1 import Pod
 
@@ -19,7 +19,7 @@ from kubernetes.client.rest import ApiException
 from kubernetes.stream import stream
 
 from . import actionstore as action_store
-from .clients import get_batch_client, get_core_api_client
+from .clients import get_batch_client, get_lightkube_client
 
 logging.basicConfig(level=logging.INFO)
 
@@ -103,7 +103,7 @@ def create_namespaced_job(job: Job):
 @action_store.kubiya_action()
 def get_pods(job: Job):
     try:
-        client = Client()
+        client = get_lightkube_client()
         return [
             pod.to_dict()
             for pod in client.list(Pod, namespace=job.namespace, labels={"job-name": job.name})
@@ -114,11 +114,10 @@ def get_pods(job: Job):
 
 
 
-Job = generic_resource.create_namespaced_resource('jobs.batch', 'v1', 'Job', 'jobs')
 @action_store.kubiya_action()
 def get_pods_status(job: Job):
     try:
-        client = Client()
+        client = get_lightkube_client()
         return [
             pod.status.phase
             for pod in client.list(Pod, namespace=job.namespace, labels={"job-name": job.name})
@@ -129,10 +128,10 @@ def get_pods_status(job: Job):
 
 @action_store.kubiya_action()
 def get_job_logs(job: Job):
-    client = Client()
     try:
+        client = get_lightkube_client()
         podnames = [
-            pod.metadata.nameec
+            pod.metadata.name
             for pod in client.list(Pod, namespace=job.namespace, labels={"job-name": job.name})
         ]
         if len(podnames) == 0:
