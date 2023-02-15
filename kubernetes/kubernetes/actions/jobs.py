@@ -128,3 +128,14 @@ def get_namespaced_job_logs(job: Job):
         raise Exception(
             f"Exception when calling BatchV1Api->create_namespaced_job: {e}"
         )
+
+class JobMeta(BaseModel):
+    name: str
+    namespace: str = "openfaas-fn"
+    
+
+@action_store.kubiya_action()
+def get_job_controller_uid(job: JobMeta):
+    api_client = get_batch_client()
+    api_response = api_client.read_namespaced_job(job.name, job.namespace)
+    return api_response.metadata.labels['controller-uid']

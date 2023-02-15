@@ -143,3 +143,21 @@ def get_running_pods(args):
         return pods
     except client.rest.ApiException as e:
         return {"error": e.reason}
+
+
+class PodMeta(BaseModel):
+    namespace: str 
+    label: str
+
+@action_store.kubiya_action()
+def get_pod_logs_by_label(args: PodMeta):
+    api_client = clients.get_core_api_client()
+    label_selector = "controller-uid={}".format(args.label)
+    api_response = api_client.list_namespaced_pod(args.namespace, label_selector=label_selector)
+    
+    
+    if api_response.items:
+        pod_name = api_response.items[0].metadata.name
+        return api_client.read_namespaced_pod_log(pod_name, args.namespace).split("\n")
+    else:
+        return "No pods found"

@@ -48,3 +48,4 @@ def delete_stuck_cronjob(args):
         )
 
     return [item.metadata.name for item in stuck_cronjobs]
+
