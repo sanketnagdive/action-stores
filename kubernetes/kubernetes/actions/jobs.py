@@ -102,6 +102,33 @@ def create_namespaced_job(job: Job):
             f"Exception when calling BatchV1Api->read_namespaced_job: {e.body}"
         )
 
+@action_store.kubiya_action()
+def delete_namespaced_job(job: Job):
+    api_client = get_batch_client()
+    try:
+        api_response = api_client.delete_namespaced_job(
+            job.job_name, job.namespace, propagation_policy="Background"
+        )
+        logging.info(f"Job deleted. response='{str(api_response)}")
+    except ApiException as e:
+        # create a meaningful error message
+        raise ApiException(
+            f"Exception when calling BatchV1Api->delete_namespaced_job: {e.body}"
+        )
+
+@action_store.kubiya_action()
+def list_namespaced_jobs(args):
+    api_client = get_batch_client()
+    jobs = []
+    try:
+        api_response = api_client.list_namespaced_job(args.get("namespace"))
+        logging.info(f"Job listed. response='{str(api_response)}")
+        for item in api_response.items:
+            jobs.append(item.metadata.name)
+        return jobs
+    except ApiException as e:
+        # create a meaningful error message
+        return {"error": f"Exception when calling BatchV1Api->list_namespaced_job: {e.body}"}
 
 @action_store.kubiya_action()
 def get_namespaced_job_logs(job: Job):
