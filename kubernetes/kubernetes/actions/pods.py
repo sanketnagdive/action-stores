@@ -14,7 +14,6 @@ class NamespacedPod(BaseModel):
     pod_name: str
     namespace: Optional[str] = None
 
-
 class Pod(BaseModel):
     """follows model with attributes of pod for kubernetes"""
 
@@ -26,7 +25,7 @@ class Pod(BaseModel):
 def create_namespaced_pod(namespaced_pod: NamespacedPod):
     """creates a namespaced pod"""
     try:
-        core_api = client.CoreV1Api()
+        core_api = clients.get_core_api_client()
         pod = client.V1Pod(
             api_version="v1",
             kind="Pod",
@@ -39,12 +38,11 @@ def create_namespaced_pod(namespaced_pod: NamespacedPod):
     except client.rest.ApiException as e:
         return {"error": e.reason}
 
-
 @action_store.kubiya_action()
 def delete_namespaced_pod(namespaced_pod: NamespacedPod):
     """deletes a namespaced pod"""
     try:
-        core_api = client.CoreV1Api()
+        core_api = clients.get_core_api_client()
         res = core_api.delete_namespaced_pod(
             name=namespaced_pod.pod_name,
             namespace=namespaced_pod.namespace,
@@ -59,8 +57,8 @@ def delete_namespaced_pod(namespaced_pod: NamespacedPod):
 def list_namespaced_pod(namespaced_pod: NamespacedPod):
     """lists all namespaced pods"""
     try:
-        core_api = client.CoreV1Api()
-        res = core_api.list_namespaced_pod(namespace=namespaced_pod.namespace)
+        core_api = clients.get_core_api_client()
+        res = core_api.list_namespaced_pod(namespace=namespaced_pod.namespace, FieldSelector=field_selector)
         return {"data": [pod.to_dict() for pod in res.items]}
     except client.rest.ApiException as e:
         return {"error": e.reason}
@@ -70,7 +68,7 @@ def list_namespaced_pod(namespaced_pod: NamespacedPod):
 def patch_namespaced_pod(namespaced_pod: NamespacedPod):
     """patches a namespaced pod"""
     try:
-        core_api = client.CoreV1Api()
+        core_api = clients.get_core_api_client()
         res = core_api.patch_namespaced_pod(
             name=namespaced_pod.pod_name, namespace=namespaced_pod.namespace, body={}
         )
@@ -83,16 +81,13 @@ def patch_namespaced_pod(namespaced_pod: NamespacedPod):
 def read_namespaced_pod(namespaced_pod: NamespacedPod):
     """reads a namespaced pod"""
     try:
-        core_api = client.CoreV1Api()
+        core_api = clients.get_core_api_client()
         res = core_api.read_namespaced_pod(
             name=namespaced_pod.pod_name, namespace=namespaced_pod.namespace
         )
         return {"data": res.to_dict()}
     except client.rest.ApiException as e:
         return {"error": e.reason}
-
-
-
 
 @action_store.kubiya_action()
 def list_failed_pods(params):
@@ -130,20 +125,34 @@ def retreive_image_tag_for_pod(input_pod: Pod):
     except client.rest.ApiException as e:
         return {"error": e.reason}
 
+@action_store.kubiya_action()
+def get_pods(args):
+    try:
+        field_selector = "status.phase=Running"
+        api_client = clients.get_core_api_client()
+        if args.get("field_selector"):
+            field_selector = args.get("field_selector")
+        if args.get("namespace"):
+            api_response = api_client.list_namespaced_pod(args.get("namespace"), field_selector=field_selector)
+            return [item.metadata.name for item in api_response.items]
+        else:
+            api_response = api_client.list_pod_for_all_namespaces(field_selector=field_selector)
+            return [item.metadata.name for item in api_response.items]
+    except client.rest.ApiException as e:
+        return {"error": e.reason}
 
 @action_store.kubiya_action()
 def get_running_pods(args):
     try:
         api_client = clients.get_core_api_client()
-        api_response = api_client.list_pod_for_all_namespaces(
-            field_selector="status.phase=Running"
-        )
-
-        pods = [item.metadata.name for item in api_response.items]
-        return pods
+        if args.get("namespace"):
+            api_response = api_client.list_namespaced_pod(args.get("namespace"), field_selector="status.phase=Running")
+            return [item.metadata.name for item in api_response.items]
+        else:
+            api_response = api_client.list_pod_for_all_namespaces(field_selector="status.phase=Running")
+            return [item.metadata.name for item in api_response.items]
     except client.rest.ApiException as e:
         return {"error": e.reason}
-
 
 class PodMeta(BaseModel):
     namespace: str 
