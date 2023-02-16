@@ -6,7 +6,7 @@ steps:
   - id: k8s_namespaces
     type: action
     action:
-      runner: <some-runner>
+      runner: demo
       store: kubernetes
       name: "list_namespace"
       parameters: {}
@@ -42,7 +42,14 @@ steps:
   - id: validate
     type: input
     value_type: boolean
-    prompt: '⚠️ Job *${job_name}* will be created with the following parameters\:\n*App label\:* ${app_label}\n*Container name\:* ${container_name}\n*Namespace\:* ${namespace}\n*Image\:* ${image}\n*Command\:* ${command}\n\nDo you want to continue?'
+    prompt: |
+      🤔 *Confirm job creation*
+      Are you sure you want to create the job *${job_name}* in namespace *${namespace}*?
+      *Details:*
+      - App label: *${app_label}*
+      - Container name: *${container_name}*
+      - Image: *${image}*
+      - Command: *${command}*
   - id: condition
     type: condition
     if:
@@ -57,7 +64,7 @@ steps:
         - id: k8s_job
           type: action
           action:
-            runner: "<some-runner>"
+            runner: "demo"
             store: kubernetes
             name: "create_namespaced_job"
             parameters:
@@ -73,20 +80,29 @@ steps:
           prompt: |
             ✅ *Done!*
             Job *${job_name}* created! Attempting to get output...
-        - id: job_output
+        - id: job_label
           type: action
           action:
-            runner: "<some-runner>"
+            runner: "demo"
             store: kubernetes
-            name: "get_namespaced_job_logs"
+            name: "get_job_controller_uid"
             parameters:
               name: ${job_name}
+              namespace: ${namespace}
+        - id: log_output
+          type: action
+          action:
+            runner: "demo"
+            store: kubernetes
+            name: "get_pod_logs_by_label"
+            parameters:
+              label: "${job_label}" # This is the label of the job controller
               namespace: ${namespace}
         - id: print_output
           type: message
           prompt: |
             ✅ *Done!*
-            Job *${job_name}* output:```${job_output}```
+            Job *${job_name}* output:```${log_output}```
       else:
         - id: cancel
           type: message
