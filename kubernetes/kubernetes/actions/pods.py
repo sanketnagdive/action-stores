@@ -101,9 +101,14 @@ def list_failed_pods(params):
 @action_store.kubiya_action()
 def list_pods(params):
     """Kubernetes AS - List pods"""
-    api_client = clients.get_core_api_client()
-    api_response = api_client.list_pod_for_all_namespaces()
-    return [item.metadata.name for item in api_response.items]
+    if params.get("namespace"):
+        api_client = clients.get_core_api_client()
+        api_response = api_client.list_namespaced_pod(params.get("namespace"))
+        return [item.metadata.name for item in api_response.items]
+    else:
+        api_client = clients.get_core_api_client()
+        api_response = api_client.list_pod_for_all_namespaces()
+        return [item.metadata.name for item in api_response.items]
 
 
 @action_store.kubiya_action()
@@ -138,6 +143,37 @@ def get_pods(args):
         else:
             api_response = api_client.list_pod_for_all_namespaces(field_selector=field_selector)
             return [item.metadata.name for item in api_response.items]
+    except client.rest.ApiException as e:
+        return {"error": e.reason}
+
+@action_store.kubiya_action()
+def get_pods_with_degraded_status(args):
+    try:
+        field_selector = "status.phase=Failed"
+        api_client = clients.get_core_api_client()
+        if args.get("field_selector"):
+            field_selector = args.get("field_selector")
+        if args.get("namespace"):
+            api_response = api_client.list_namespaced_pod(args.get("namespace"), field_selector=field_selector)
+            return [item.metadata.name for item in api_response.items]
+        else:
+            api_response = api_client.list_pod_for_all_namespaces(field_selector=field_selector)
+            return [item.metadata.name for item in api_response.items]
+    except client.rest.ApiException as e:
+        return {"error": e.reason}
+
+@action_store.kubiya_action()
+def get_logs_for_pod(args):
+    try:
+        api_client = clients.get_core_api_client()
+        if args.get("namespace"):
+            api_response = api_client.read_namespaced_pod_log(args.get("pod_name"), args.get("namespace"))
+            return api_response
+        else:
+            # limit the number of lines to 10
+            # get the logs for a pod in all namespaces
+            api_response = api_client.read_namespaced_pod_log(args.get("pod_name"), "default", tail_lines=10)
+            return api_response
     except client.rest.ApiException as e:
         return {"error": e.reason}
 
