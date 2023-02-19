@@ -70,8 +70,10 @@ def text_in_build_log(params: dict):
 
 @actions_store.kubiya_action()
 def filter_text_in_build_log(params: dict):
-    log_output = get_wrapper(f"job/{params['job_name']}/{params['build_number']}/consoleText")
-    return [line for line in log_output.splitlines() if text_in_log_output(line, params["text"])]
+    if text_in_build_log(params):
+        return [line for line in log_output.splitlines() if text_in_log_output(line, params["text"])]
+    else:
+        raise Exception(f"Text {params['text']} not found in build log")
 
 @actions_store.kubiya_action()
 def get_build_url(params: dict):
