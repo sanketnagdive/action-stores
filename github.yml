@@ -1,0 +1,13 @@
+version: 1.0
+provider:
+  name: openfaas
+  gateway: http://127.0.0.1:8080
+functions:
+  github:
+    lang: runner-template-python3
+    handler: ./github
+    image: 564407622114.dkr.ecr.eu-west-1.amazonaws.com/actionstore/kubernetes:githuba
+    annotations:
+      topic: "github"
+      
+

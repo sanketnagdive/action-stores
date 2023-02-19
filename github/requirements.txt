@@ -1,0 +1,5 @@
+kubiya
+pydantic
+requests
+aiohttp
+PyGithub==1.55
