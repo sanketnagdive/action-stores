@@ -1,0 +1,11 @@
+version: 1.0
+provider:
+  name: openfaas
+  gateway: https://openfaas-gw.dev.kubiya.ai
+functions:
+  jenkins:
+    lang: runner-template-python3
+    handler: ./jenkins
+    image: kubiya/action-store-jenkins
+    annotations:
+      topic: jenkins

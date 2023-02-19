@@ -1,0 +1,48 @@
+version: 3 
+type: conversation
+name: "jenkins_last_build"
+steps:
+  - id: list_jobs
+    type: action
+    action:
+      runner: "kubiyamichaelg"
+      store: jenkins
+      name: get_all_jobs
+      parameters:
+        type: all
+  - id: job_names
+    type: jq
+    jq: .list_jobs.jobs[].name
+  - id: jenkins_job
+    type: input
+    value_type: enum
+    prompt: "Select the Jenkins job you'd like to see the last build from."
+    possible_values: ${job_names}
+  - id: last_build
+    type: action
+    action:
+      runner: "kubiyamichaelg"
+      store: jenkins
+      name: get_last_build
+      parameters:
+        job_name: ${jenkins_job}
+  - id: json_return
+    type: condition
+    if:
+      arg: ${last_build}
+      is: equals
+      arg2: "null"
+      then:
+      - id: end_flow
+        type: message
+        prompt: "Jenkins job has had no last build."
+      else:
+      - id: job_id
+        type: jq
+        jq: .last_build.lastBuild.id
+      - id: job_result
+        type: jq
+        jq: .last_build.lastBuild.result
+      - id: show_job
+        type: message
+        prompt: "The last executed build for ${jenkins_job} was ID:${job_id} and resulted in: ${job_result}"

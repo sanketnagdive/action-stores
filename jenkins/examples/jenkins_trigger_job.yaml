@@ -1,0 +1,53 @@
+version: 3
+type: conversation
+name: "jenkins_trigger_job"
+steps:
+  - id: list_jobs
+    type: action
+    action:
+      runner: "kubiyamichaelg"
+      store: jenkins
+      name: get_all_jobs
+      parameters:
+        type: all
+  - id: job_names
+    type: jq
+    jq: .list_jobs.jobs[].name
+  - id: one_job
+    type: input
+    prompt: Which job would you like to trigger?
+    value_type: enum
+    possible_values: ${job_names}
+  - id: confirm
+    type: input
+    value_type: boolean
+    prompt: "Are you sure you want to trigger ${one_job}?"
+  - id: date
+    type: input
+    value_type: datetime
+    prompt: "When would you like to run this job?" 
+  - id: confirm_conditional
+    type: condition
+    if:
+      arg: ${confirm}
+      is: equals
+      arg2: "true"
+      then:
+        - id: trigger_job
+          type: action
+          action:
+            run_at: ${date}
+            runner: "kubiyamichaelg"
+            store: jenkins
+            name: build_job
+            parameters:
+              job_name: ${one_job}
+        - id: send_information
+          type: message
+          prompt: "🎉 Pipeline: *${one_job}* started successfully! I will let you know as soon as it finishes"
+      else:
+        - id: end_flow
+          type: message
+          prompt: "Ok, just message me if you need anything else!"
+  - id: exit
+    type: exit

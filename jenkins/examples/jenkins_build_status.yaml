@@ -1,0 +1,48 @@
+version: 3
+type: conversation
+name: "Jenkins - get build status"
+steps:
+  - id: list_jobs
+    type: action
+    action:
+      runner: "demo"
+      store: jenkins
+      name: get_all_jobs
+      parameters:
+        type: all
+  - id: job_names
+    type: jq
+    jq: .list_jobs.jobs[].name
+  - id: one_job
+    type: input
+    prompt: Which job would you like to get the build status from?
+    value_type: enum
+    possible_values: ${job_names}
+  - id: confirm
+    type: input
+    value_type: boolean
+    prompt: "Are you sure you want to get the build status from ${one_job}?"
+  - id: confirm_conditional
+    type: condition
+    if:
+      arg: ${confirm}
+      is: equals
+      arg2: "true"
+      then:
+        - id: get_build_status
+          type: action
+          action:
+            runner: "demo"
+            store: jenkins
+            name: get_build_status
+            parameters:
+              job_name: ${one_job}
+        - id: send_information
+          type: message
+          prompt: "🎉 Pipeline: *${one_job}* is currently *${get_build_status.status}*"
+      else:
+        - id: end_flow
+          type: message
+          prompt: "Ok, just message me if you need anything else!"
+  - id: exit
+    type: exit

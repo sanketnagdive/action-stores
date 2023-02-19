@@ -1,0 +1,50 @@
+version: 3 
+type: conversation
+name: "Pull Logs out of Jenkins"
+steps:
+  - id: list_jobs
+    type: action
+    action:
+      runner: "demo"
+      store: jenkins
+      name: get_all_jobs
+      parameters:
+        type: all
+  - id: job_names
+    type: jq
+    jq: .list_jobs.jobs[].name
+  - id: jenkins_job
+    type: input
+    value_type: enum
+    prompt: "Select the Jenkins job you'd like to see logs from."
+    possible_values: ${job_names}
+  - id: list_builds
+    type: action
+    action:
+      runner: "demo"
+      store: jenkins
+      name: get_all_builds
+      parameters:
+        job_name: ${jenkins_job}
+  - id: build_numbers
+    type: jq
+    jq: .list_builds.builds[].number | tostring
+  - id: build_number
+    type: input
+    value_type: enum
+    prompt: "Build number?"
+    possible_values: ${build_numbers}
+  - id: jenkins_logs
+    type: action
+    action:
+      runner: "demo"
+      store: jenkins
+      name: get_jenkins_logs
+      parameters:
+        job_name: ${jenkins_job}
+        jenkins_number: ${build_number}
+  - id: log_return
+    type: message
+    prompt: ${jenkins_logs}
+  - id: exit
+    type: exit

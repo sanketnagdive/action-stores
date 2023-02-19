@@ -1,0 +1,20 @@
+version: 3
+type: conversation
+name: "jenkins_get_jobs"
+steps:
+  - id: list_jobs
+    type: action
+    action:
+      runner: "kubiyamichaelg"
+      store: jenkins
+      name: get_all_jobs
+      parameters:
+        type: all
+  - id: job_names
+    type: jq
+    jq: .list_jobs.jobs[].name
+  - id: all_jobs_list
+    type: json_message
+    prompt: "${job_names}"
+  - id: exit
+    type: exit
