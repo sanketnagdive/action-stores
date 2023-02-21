@@ -1,7 +1,7 @@
 version: 1.0
 provider:
   name: openfaas
-  gateway: https://openfaas-gw.dev.kubiya.ai
+  gateway: http://localhost:8080
 functions:
   jenkins:
     lang: runner-template-python3
