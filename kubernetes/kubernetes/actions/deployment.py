@@ -9,6 +9,11 @@ class Deployment(BaseModel):
     deployment_name: Optional[str] = None
     namespace: Optional[str] = "default"
 
+class DeploymentReplicasInput(BaseModel):
+    deployment_name: Optional[str] = None
+    namespace: Optional[str] = "default"
+    replicas: Optional[int] = None
+
 @action_store.kubiya_action()
 def get_deployment_logs(params):
     if "selector" in params:
@@ -97,7 +102,26 @@ def get_deployment_image(args):
         return api_response.spec.template.spec.containers[0].image
     except client.rest.ApiException as e:
         return {"error": e.reason}
-
+    
+@action_store.kubiya_action()
+def get_deployment_replicas(args):
+    try:
+        api_client = clients.get_apps_client()
+        api_response = api_client.read_namespaced_deployment(args.get("deployment_name"), args.get("namespace"))
+        return api_response.spec.replicas
+    except client.rest.ApiException as e:
+        return {"error": e.reason}
+    
+@action_store.kubiya_action()
+def set_deployment_replicas(args: DeploymentReplicasInput):
+    try:
+        api_client = clients.get_apps_client()
+        api_response = api_client.read_namespaced_deployment(args.get("deployment_name"), args.get("namespace"))
+        api_response.spec.replicas = args.get("replicas")
+        api_response = api_client.patch_namespaced_deployment(args.get("deployment_name"), args.get("namespace"), api_response)
+        return api_response.spec.replicas
+    except client.rest.ApiException as e:
+        return {"error": e.reason}
 
 @action_store.kubiya_action()
 def list_deployment(params: Deployment):
