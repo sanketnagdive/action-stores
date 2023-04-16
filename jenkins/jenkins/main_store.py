@@ -14,7 +14,7 @@ def get_wrapper(path: str):
     host, username, password = get_secrets()
     ret = requests.get(f"{host}/{path}", auth=(username, password))
     if not ret.ok:
-        raise Exception("Error: {ret.status_code} {ret.text}")
+        raise Exception(f"Error: {ret.status_code} {ret.text}")
     if ret.headers.get("Content-Type","").startswith("application/json"):
         return ret.json()
     else:
