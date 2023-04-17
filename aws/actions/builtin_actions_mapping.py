@@ -83,12 +83,7 @@ def get_actions_map() -> Dict[str, Dict]:
         for service in get_service_list()
     }
 
-def get_narrow_actions_map() -> Dict[str, Dict]:
-    return {
-        serv: get_service_operations(serv)
-        for serv in ['eks', 's3', 'sqs', 'iam', 'ecs', 'ecr', 'ssm', 'ec2']
-    }
-    
+
 def register_all_actions():
     services = get_actions_map()
     for service, operations in services.items():
@@ -97,13 +92,59 @@ def register_all_actions():
             action = partial(aws_wrapper, service, method_name)
             action_store.register_action(actionname, action)
 
+def get_narrow_actions_map() -> Dict[str, Dict]:    
+    endpoint_url=os.environ.get('LOCALSTACK_HOST')
 
+    s3 = boto3.client('s3', endpoint_url=endpoint_url)
+    ecr = boto3.client('ecr', endpoint_url=endpoint_url)
+    ecs = boto3.client('ecs', endpoint_url=endpoint_url)
+    sts = boto3.client('sts', endpoint_url=endpoint_url)
+    iam = boto3.client('iam', endpoint_url=endpoint_url)
+    ssm = boto3.client('ssm', endpoint_url=endpoint_url)
+    sqs = boto3.client('sqs', endpoint_url=endpoint_url)
+    ec2 = boto3.client('ec2', endpoint_url=endpoint_url)
+    
+    return {
+        's3.ListBuckets':                       s3.list_buckets,
+        's3.ListObjects':                       s3.list_objects,
+        's3.CopyObject':                        s3.copy_object,
+        
+        'ecr.DescribeRepositories':             ecr.describe_repositories,
+        'ecr.DescribeImages':                   ecr.describe_images,
+        'ecr.ListImages':                       ecr.list_images,
+        
+        'ecs.ListClusters':                     ecs.list_clusters,
+        'ecs.ListServices':                     ecs.list_services,
+        'ecs.UpdateService':                    ecs.update_service,
+        'ecs.DescribeClusters':                 ecs.describe_clusters,
+        'ecs.ListTaskDefinitions':              ecs.list_task_definitions,
+        'ecs.DescribeTaskDefinition':           ecs.describe_task_definition,
+        
+        'sts.GetCallerIdentity':                sts.get_caller_identity,
+        
+        'iam.ListRoles':                        iam.list_roles,
+        'iam.ListUsers':                        iam.list_users,
+        'iam.ListGroups':                       iam.list_groups,
+        'iam.ListPolicies':                     iam.list_policies,
+        'iam.AttachRolePolicy':                 iam.attach_role_policy,
+        
+        'ssm.PutParameter':                     ssm.put_parameter,
+        
+        'sqs.ListQueues':                       sqs.list_queues,
+        'sqs.SendMessage':                      sqs.send_message,
+        
+        'ec2.DescribeInstances':                ec2.describe_instances,
+        'ec2.TerminateInstances':               ec2.terminate_instances,
+        'ec2.RebootInstances':                  ec2.reboot_instances,
+        'ec2.RunInstances':                     ec2.run_instances,
+        'ec2.DescribeInstanceTypes':            ec2.describe_instances,
+        'ec2.DescribeSecurityGroups':           ec2.describe_security_groups,
+        'ec2.DescribeImages':                   ec2.describe_images,
+        'ec2.DescribeSecurityGroupRules':       ec2.describe_security_groups,
+    }
+    
 def register_some_actions():
-    services = get_narrow_actions_map()
-    for service, operations in services.items():
-        for operation_name, method_name in operations.items():
-            actionname = f"{service}.{operation_name}"
-            action = partial(aws_wrapper, service, method_name)
-            action_store.register_action(actionname, action)
+    for operation_name, method in get_narrow_actions_map().items():
+        action_store.register_action(operation_name, method)
 
 register_some_actions()
