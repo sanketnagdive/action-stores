@@ -92,7 +92,8 @@ def register_all_actions():
             action = partial(aws_wrapper, service, method_name)
             action_store.register_action(actionname, action)
 
-def get_narrow_actions_map() -> Dict[str, Dict]:    
+    
+def register_some_actions(action_store):
     endpoint_url=os.environ.get('LOCALSTACK_HOST')
 
     s3 = boto3.client('s3', endpoint_url=endpoint_url)
@@ -104,47 +105,35 @@ def get_narrow_actions_map() -> Dict[str, Dict]:
     sqs = boto3.client('sqs', endpoint_url=endpoint_url)
     ec2 = boto3.client('ec2', endpoint_url=endpoint_url)
     
-    return {
-        's3.ListBuckets':                       s3.list_buckets,
-        's3.ListObjects':                       s3.list_objects,
-        's3.CopyObject':                        s3.copy_object,
-        
-        'ecr.DescribeRepositories':             ecr.describe_repositories,
-        'ecr.DescribeImages':                   ecr.describe_images,
-        'ecr.ListImages':                       ecr.list_images,
-        
-        'ecs.ListClusters':                     ecs.list_clusters,
-        'ecs.ListServices':                     ecs.list_services,
-        'ecs.UpdateService':                    ecs.update_service,
-        'ecs.DescribeClusters':                 ecs.describe_clusters,
-        'ecs.ListTaskDefinitions':              ecs.list_task_definitions,
-        'ecs.DescribeTaskDefinition':           ecs.describe_task_definition,
-        
-        'sts.GetCallerIdentity':                sts.get_caller_identity,
-        
-        'iam.ListRoles':                        iam.list_roles,
-        'iam.ListUsers':                        iam.list_users,
-        'iam.ListGroups':                       iam.list_groups,
-        'iam.ListPolicies':                     iam.list_policies,
-        'iam.AttachRolePolicy':                 iam.attach_role_policy,
-        
-        'ssm.PutParameter':                     ssm.put_parameter,
-        
-        'sqs.ListQueues':                       sqs.list_queues,
-        'sqs.SendMessage':                      sqs.send_message,
-        
-        'ec2.DescribeInstances':                ec2.describe_instances,
-        'ec2.TerminateInstances':               ec2.terminate_instances,
-        'ec2.RebootInstances':                  ec2.reboot_instances,
-        'ec2.RunInstances':                     ec2.run_instances,
-        'ec2.DescribeInstanceTypes':            ec2.describe_instances,
-        'ec2.DescribeSecurityGroups':           ec2.describe_security_groups,
-        'ec2.DescribeImages':                   ec2.describe_images,
-        'ec2.DescribeSecurityGroupRules':       ec2.describe_security_groups,
-    }
-    
-def register_some_actions():
-    for operation_name, method in get_narrow_actions_map().items():
-        action_store.register_action(operation_name, method)
+    action_store.register_action('s3.ListBuckets', lambda x: s3.list_buckets(**{"input": x}))
+    action_store.register_action('s3.ListObjects', lambda x: s3.list_objects(**{"input": x}))
+    action_store.register_action('s3.CopyObject', lambda x: s3.copy_object(**{"input": x}))
+    action_store.register_action('ecr.DescribeRepositories', lambda x: ecr.describe_repositories(**{"input": x}))
+    action_store.register_action('ecr.DescribeImages', lambda x: ecr.describe_images(**{"input": x}))
+    action_store.register_action('ecr.ListImages', lambda x: ecr.list_images(**{"input": x}))
+    action_store.register_action('ecs.ListClusters', lambda x: ecs.list_clusters(**{"input": x}))
+    action_store.register_action('ecs.ListServices', lambda x: ecs.list_services(**{"input": x}))
+    action_store.register_action('ecs.UpdateService', lambda x: ecs.update_service(**{"input": x}))
+    action_store.register_action('ecs.DescribeClusters', lambda x: ecs.describe_clusters(**{"input": x}))
+    action_store.register_action('ecs.ListTaskDefinitions', lambda x: ecs.list_task_definitions(**{"input": x}))
+    action_store.register_action('ecs.DescribeTaskDefinition', lambda x: ecs.describe_task_definition(**{"input": x}))
+    action_store.register_action('sts.GetCallerIdentity', lambda x: sts.get_caller_identity(**{"input": x}))
+    action_store.register_action('iam.ListRoles', lambda x: iam.list_roles(**{"input": x}))
+    action_store.register_action('iam.ListUsers', lambda x: iam.list_users(**{"input": x}))
+    action_store.register_action('iam.ListGroups', lambda x: iam.list_groups(**{"input": x}))
+    action_store.register_action('iam.ListPolicies', lambda x: iam.list_policies(**{"input": x}))
+    action_store.register_action('iam.AttachRolePolicy', lambda x: iam.attach_role_policy(**{"input": x}))
+    action_store.register_action('ssm.PutParameter', lambda x: ssm.put_parameter(**{"input": x}))
+    action_store.register_action('sqs.ListQueues', lambda x: sqs.list_queues(**{"input": x}))
+    action_store.register_action('sqs.SendMessage', lambda x: sqs.send_message(**{"input": x}))
+    action_store.register_action('ec2.DescribeInstances', lambda x: ec2.describe_instances(**{"input": x}))
+    action_store.register_action('ec2.TerminateInstances', lambda x: ec2.terminate_instances(**{"input": x}))
+    action_store.register_action('ec2.RebootInstances', lambda x: ec2.reboot_instances(**{"input": x}))
+    action_store.register_action('ec2.RunInstances', lambda x: ec2.run_instances(**{"input": x}))
+    action_store.register_action('ec2.DescribeInstanceTypes', lambda x: ec2.describe_instances(**{"input": x}))
+    action_store.register_action('ec2.DescribeSecurityGroups', lambda x: ec2.describe_security_groups(**{"input": x}))
+    action_store.register_action('ec2.DescribeImages', lambda x: ec2.describe_images(**{"input": x}))
+    action_store.register_action('ec2.DescribeSecurityGroupRules', lambda x: ec2.describe_security_groups(**{"input": x}))
+     
 
-register_some_actions()
+register_some_actions(action_store)
