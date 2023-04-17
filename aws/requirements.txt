@@ -1,0 +1,3 @@
+kubiya
+pydantic
+boto3
