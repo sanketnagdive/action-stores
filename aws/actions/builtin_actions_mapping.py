@@ -69,6 +69,10 @@ def get_service_list() -> List[str]:
     print("Mapping available AWS services ..")
     return session.get_available_resources() + session.get_available_services()
 
+def get_narrow_service_list() -> List[str]:
+    return ['eks', 's3', 'sqs, iam', 'ecs', 'ecr', 'ssm', 'ec2']
+
+
 def get_service_operations(service: str) -> Dict:
     cli = boto3.client(service)
     return {
@@ -82,6 +86,12 @@ def get_actions_map() -> Dict[str, Dict]:
         for service in get_service_list()
     }
 
+def get_narrow_actions_map() -> Dict[str, Dict]:
+    return {
+        service: get_service_operations(service)
+        for service in get_narrow_service_list()
+    }
+    
 def register_all_actions():
     services = get_actions_map()
     for service, operations in services.items():
@@ -90,4 +100,13 @@ def register_all_actions():
             action = partial(aws_wrapper, service, method_name)
             action_store.register_action(actionname, action)
 
-register_all_actions()
+
+def register_some_actions():
+    services = get_actions_map()
+    for service, operations in services.items():
+        for operation_name, method_name in operations.items():
+            actionname = f"{service}.{operation_name}"
+            action = partial(aws_wrapper, service, method_name)
+            action_store.register_action(actionname, action)
+
+register_some_actions()
