@@ -92,9 +92,15 @@ def register_all_actions():
             action_store.register_action(actionname, action)
 
 def register_all_actions_from_cache():
-    awscache = pickle.load(open("awscache.pkl", "rb"))
-    for actionname, action in awscache.items():
-        action_store.register_action(actionname, action)
+    import base64
+    from .awscache import PICKLE
+    services = pickle.loads(base64.b64decode(PICKLE))
+    for service, operations in services.items():
+        for operation_name, method_name in operations.items():
+            actionname = f"{service}.{operation_name}"
+            action = partial(aws_wrapper, service, method_name)
+            action_store.register_action(actionname, action)
+
         
 
 
