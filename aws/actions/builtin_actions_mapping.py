@@ -6,6 +6,7 @@ from functools import partial
 from typing import Optional, List, Dict
 import os
 from . import actionstore as action_store
+import pickle
 
 logging.basicConfig(level=logging.INFO)
 
@@ -27,7 +28,7 @@ logging.basicConfig(level=logging.INFO)
 
 # LocalStack is a mock AWS service that can be used for local development
 # Port 4566 is the default port for LocalStack
-USE_LOCALSTACK = os.environ.get("LOCALSTACK_HOST")
+USE_LOCALSTACK = "LOCALSTACK_HOST" in os.environ
 
 # Region is set to us-east-1 by default. This is because the AWS SDK will
 # automatically use the region from the environment variable AWS_DEFAULT_REGION
@@ -90,4 +91,11 @@ def register_all_actions():
             action = partial(aws_wrapper, service, method_name)
             action_store.register_action(actionname, action)
 
-register_all_actions()
+def register_all_actions_from_cache():
+    awscache = pickle.load(open("awscache.pkl", "rb"))
+    for actionname, action in awscache.items():
+        action_store.register_action(actionname, action)
+        
+
+
+register_all_actions_from_cache()
