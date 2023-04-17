@@ -92,6 +92,7 @@ def register_all_actions():
             action = partial(aws_wrapper, service, method_name)
             action_store.register_action(actionname, action)
 
+
     
 def register_some_actions(action_store):
     endpoint_url=os.environ.get('LOCALSTACK_HOST')
@@ -105,35 +106,122 @@ def register_some_actions(action_store):
     sqs = boto3.client('sqs', endpoint_url=endpoint_url)
     ec2 = boto3.client('ec2', endpoint_url=endpoint_url)
     
-    action_store.register_action('s3.ListBuckets', lambda x: s3.list_buckets(**{"input": x}))
-    action_store.register_action('s3.ListObjects', lambda x: s3.list_objects(**{"input": x}))
-    action_store.register_action('s3.CopyObject', lambda x: s3.copy_object(**{"input": x}))
-    action_store.register_action('ecr.DescribeRepositories', lambda x: ecr.describe_repositories(**{"input": x}))
-    action_store.register_action('ecr.DescribeImages', lambda x: ecr.describe_images(**{"input": x}))
-    action_store.register_action('ecr.ListImages', lambda x: ecr.list_images(**{"input": x}))
-    action_store.register_action('ecs.ListClusters', lambda x: ecs.list_clusters(**{"input": x}))
-    action_store.register_action('ecs.ListServices', lambda x: ecs.list_services(**{"input": x}))
-    action_store.register_action('ecs.UpdateService', lambda x: ecs.update_service(**{"input": x}))
-    action_store.register_action('ecs.DescribeClusters', lambda x: ecs.describe_clusters(**{"input": x}))
-    action_store.register_action('ecs.ListTaskDefinitions', lambda x: ecs.list_task_definitions(**{"input": x}))
-    action_store.register_action('ecs.DescribeTaskDefinition', lambda x: ecs.describe_task_definition(**{"input": x}))
-    action_store.register_action('sts.GetCallerIdentity', lambda x: sts.get_caller_identity(**{"input": x}))
-    action_store.register_action('iam.ListRoles', lambda x: iam.list_roles(**{"input": x}))
-    action_store.register_action('iam.ListUsers', lambda x: iam.list_users(**{"input": x}))
-    action_store.register_action('iam.ListGroups', lambda x: iam.list_groups(**{"input": x}))
-    action_store.register_action('iam.ListPolicies', lambda x: iam.list_policies(**{"input": x}))
-    action_store.register_action('iam.AttachRolePolicy', lambda x: iam.attach_role_policy(**{"input": x}))
-    action_store.register_action('ssm.PutParameter', lambda x: ssm.put_parameter(**{"input": x}))
-    action_store.register_action('sqs.ListQueues', lambda x: sqs.list_queues(**{"input": x}))
-    action_store.register_action('sqs.SendMessage', lambda x: sqs.send_message(**{"input": x}))
-    action_store.register_action('ec2.DescribeInstances', lambda x: ec2.describe_instances(**{"input": x}))
-    action_store.register_action('ec2.TerminateInstances', lambda x: ec2.terminate_instances(**{"input": x}))
-    action_store.register_action('ec2.RebootInstances', lambda x: ec2.reboot_instances(**{"input": x}))
-    action_store.register_action('ec2.RunInstances', lambda x: ec2.run_instances(**{"input": x}))
-    action_store.register_action('ec2.DescribeInstanceTypes', lambda x: ec2.describe_instances(**{"input": x}))
-    action_store.register_action('ec2.DescribeSecurityGroups', lambda x: ec2.describe_security_groups(**{"input": x}))
-    action_store.register_action('ec2.DescribeImages', lambda x: ec2.describe_images(**{"input": x}))
-    action_store.register_action('ec2.DescribeSecurityGroupRules', lambda x: ec2.describe_security_groups(**{"input": x}))
+    def mylist_buckets(params):
+        return s3.list_buckets(**params)
+    action_store.register_action('s3.ListBuckets', mylist_buckets)
+    
+    def mylist_objects(params):
+        return s3.list_objects(**params)
+    action_store.register_action('s3.ListObjects', mylist_objects)
+    
+    def mycopy_object(params):
+        return s3.copy_object(**params)
+    action_store.register_action('s3.CopyObject', mycopy_object)
+    
+    def mydescribe_repositories(params):
+        return ecr.describe_repositories(**params)
+    action_store.register_action('ecr.DescribeRepositories', mydescribe_repositories)
+    
+    def mydescribe_images(params):
+        return ecr.describe_images(**params)
+    action_store.register_action('ecr.DescribeImages', mydescribe_images)
+    
+    def mylist_images(params):
+        return ecr.list_images(**params)
+    action_store.register_action('ecr.ListImages', mylist_images)
+    
+    def mylist_clusters(params):
+        return ecs.list_clusters(**params)
+    action_store.register_action('ecs.ListClusters', mylist_clusters)
+    
+    def mylist_services(params):
+        return ecs.list_services(**params)
+    action_store.register_action('ecs.ListServices', mylist_services)
+    
+    def myupdate_service(params):
+        return ecs.update_service(**params)
+    action_store.register_action('ecs.UpdateService', myupdate_service)
+    
+    def mydescribe_clusters(params):
+        return ecs.describe_clusters(**params)
+    action_store.register_action('ecs.DescribeClusters', mydescribe_clusters)
+    
+    def mylist_task_definitions(params):
+        return ecs.list_task_definitions(**params)
+    action_store.register_action('ecs.ListTaskDefinitions', mylist_task_definitions)
+    
+    def mydescribe_task_definition(params):
+        return ecs.describe_task_definition(**params)
+    action_store.register_action('ecs.DescribeTaskDefinition', mydescribe_task_definition)
+    
+    def myget_caller_identity(params):
+        return sts.get_caller_identity(**params)
+    action_store.register_action('sts.GetCallerIdentity', myget_caller_identity)
+    
+    def mylist_roles(params):
+        return iam.list_roles(**params)
+    action_store.register_action('iam.ListRoles', mylist_roles)
+    
+    def mylist_users(params):
+        return iam.list_users(**params)
+    action_store.register_action('iam.ListUsers', mylist_users)
+    
+    def mylist_groups(params):
+        return iam.list_groups(**params)
+    action_store.register_action('iam.ListGroups', mylist_groups)
+    
+    def mylist_policies(params):
+        return iam.list_policies(**params)
+    action_store.register_action('iam.ListPolicies', mylist_policies)
+    
+    def myattach_role_policy(params):
+        return iam.attach_role_policy(**params)
+    action_store.register_action('iam.AttachRolePolicy', myattach_role_policy)
+    
+    def myput_parameter(params):
+        return ssm.put_parameter(**params)
+    action_store.register_action('ssm.PutParameter', myput_parameter)
+    
+    def mylist_queues(params):
+        return sqs.list_queues(**params)
+    action_store.register_action('sqs.ListQueues', mylist_queues)
+    
+    def mysend_message(params):
+        return sqs.send_message(**params)
+    action_store.register_action('sqs.SendMessage', mysend_message)
+    
+    def mydescribe_instances(params):
+        return ec2.describe_instances(**params)
+    action_store.register_action('ec2.DescribeInstances', mydescribe_instances)
+    
+    def myterminate_instances(params):
+        return ec2.terminate_instances(**params)
+    action_store.register_action('ec2.TerminateInstances', myterminate_instances)
+    
+    def myreboot_instances(params):
+        return ec2.reboot_instances(**params)
+    action_store.register_action('ec2.RebootInstances', myreboot_instances)
+    
+    def myrun_instances(params):
+        return ec2.run_instances(**params)
+    action_store.register_action('ec2.RunInstances', myrun_instances)
+    
+    def mydescribe_instances(params):
+        return ec2.describe_instances(**params)
+    action_store.register_action('ec2.DescribeInstanceTypes', mydescribe_instances)
+    
+    def mydescribe_security_groups(params):
+        return ec2.describe_security_groups(**params)
+    action_store.register_action('ec2.DescribeSecurityGroups', mydescribe_security_groups)
+    
+    def mydescribe_images(params):
+        return ec2.describe_images(**params)
+    action_store.register_action('ec2.DescribeImages', mydescribe_images)
+    
+    def mydescribe_security_groups(params):
+        return ec2.describe_security_groups(**params)
+    action_store.register_action('ec2.DescribeSecurityGroupRules', mydescribe_security_groups)
+    
      
 
 register_some_actions(action_store)
