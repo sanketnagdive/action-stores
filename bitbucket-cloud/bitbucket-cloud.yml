@@ -1,0 +1,11 @@
+version: 1.0
+provider:
+  name: openfaas
+  gateway: http://localhost:8080
+functions:
+  bitbucket:
+    lang: runner-template-python3
+    handler: ./bitbucket
+    image: kubiya/action-store-bitbucket-cloud
+    annotations:
+      topic: bitbucket
