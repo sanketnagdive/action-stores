@@ -231,7 +231,9 @@ class Client(BaseClient):
             params=params,
         )
 
-    def get_repository_source_code(self, repository_slug, params=None):
+    def get_repository_source_code(
+        self, repository_slug, branch_or_commit, params=None
+    ):
         """Returns data about the source code of given repository.
 
         Args:
@@ -242,22 +244,29 @@ class Client(BaseClient):
 
         """
         return self._get(
-            "2.0/repositories/{}/{}/src".format(self.workspace, repository_slug),
-            params=params,
-        )
-
-    def get_repository_folder_source_code(self, repository_slug, path="", params=None):
-        return self._get(
-            "2.0/repositories/{}/{}/src/{}".format(
-                self.workspace, repository_slug, path
+            "2.0/repositories/{}/{}/src/{}/".format(
+                self.workspace, repository_slug, branch_or_commit
             ),
             params=params,
         )
 
-    def get_repository_structure(self, repository_slug, params=None):
+    def get_repository_folder_source_code(
+        self, repository_slug, branch_or_commit, path="", params=None
+    ):
+        return self._get(
+            "2.0/repositories/{}/{}/src/{}/{}".format(
+                self.workspace, repository_slug, branch_or_commit, path
+            ),
+            params=params,
+        )
+
+    def get_repository_structure(self, repository_slug, branch_or_commit, params=None):
         objs = list(
             self.all_pages(
-                self.get_repository_source_code, repository_slug, params=params
+                self.get_repository_source_code,
+                repository_slug,
+                branch_or_commit,
+                params=params,
             )
         )
         return self._get_objs(repository_slug, objs, params=params)
