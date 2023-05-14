@@ -316,9 +316,9 @@ class Client(BaseClient):
     def _get_objs(
         self,
         repository_slug: str,
-        objs: list[typing.Dict[str, typing.Any]],
+        objs: typing.List[typing.Dict[str, typing.Any]],
         params=None,
-    ) -> list[dict[str, typing.Any]]:
+    ) -> typing.List[dict[str, typing.Any]]:
         files = []
         for obj in objs:
             if obj.get("type") == "commit_directory":
