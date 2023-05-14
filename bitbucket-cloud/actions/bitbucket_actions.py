@@ -163,21 +163,43 @@ class File(BaseModel):
         return (self.path, self.content)
 
 
-class UploadFilesInput(BaseModel):
+# TODO: uncomment after Bugfix: https://kubiya.atlassian.net/browse/PLAT-1123
+# class UploadFilesInput(BaseModel):
+#     workspace: str
+#     repository: str
+#     branch: str
+#     commit_message: str
+#     files: List[File]
+
+
+# @action_store.kubiya_action()
+# def upload_files(input: UploadFilesInput):
+#     client = get_client(input.workspace)
+#     res = client.post_repository_files(
+#         input.repository,
+#         input.commit_message,
+#         input.branch,
+#         files={file.path: file.to_file_request_input() for file in input.files},
+#     )
+#     return res
+
+
+class UploadFileInput(BaseModel):
     workspace: str
     repository: str
     branch: str
     commit_message: str
-    files: List[File]
+    file_path: str
+    file_content: str
 
 
 @action_store.kubiya_action()
-def upload_files(input: UploadFilesInput):
+def upload_file(input: UploadFileInput):
     client = get_client(input.workspace)
     res = client.post_repository_files(
         input.repository,
         input.commit_message,
         input.branch,
-        files={file.path: file.to_file_request_input() for file in input.files},
+        files={input.file_path: input.file_content},
     )
     return res
