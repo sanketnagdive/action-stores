@@ -32,13 +32,82 @@ class Job(BaseModel):
     kubernetes_client_retry_attempts: int = 44
     kubernetes_client_timeout: int = 55
     job_name: str = "example-job"
-    namespace: str = "openfaas-fn"
+    namespace: str = "default"
     image: str = "nginx:latest"
     container_name: str = "example-container"
     env_vars: Optional[Dict[str, str]] = None
     app_label: str = "example-app"
     restart_policy: str = "Never"
 
+class JobMeta(BaseModel):
+    name: str
+    namespace: str = "default"
+
+class JobCompletionMeta(JobMeta):
+    timeout: int = 300
+
+class JobScaleInput(JobMeta):
+    parallelism: int
+    completions: int
+
+class JobStatusOutput(BaseModel):
+    active: Optional[int]
+    succeeded: Optional[int]
+    failed: Optional[int]
+
+class Namespace(BaseModel):
+    namespace: str = "default"
+
+@action_store.kubiya_action()
+def scale_job(params: JobScaleInput):
+    api_client = get_batch_client()
+    api_response = api_client.read_namespaced_job(params.name, params.namespace)
+    api_response.spec.parallelism = params.parallelism
+    api_response.spec.completions = params.completions
+    api_response = api_client.patch_namespaced_job(params.name, params.namespace, api_response)
+    return api_response
+
+@action_store.kubiya_action()
+def get_job_status(job: JobMeta) -> JobStatusOutput:
+    api_client = get_batch_client()
+    api_response = api_client.read_namespaced_job(job.name, job.namespace)
+    status = api_response.status
+    return JobStatusOutput(active=status.active, succeeded=status.succeeded, failed=status.failed)
+
+@action_store.kubiya_action()
+def get_job_events(job: JobMeta):
+    api_client = get_core_api_client()
+    api_response = api_client.list_namespaced_event(job.namespace, field_selector=f"involvedObject.kind=Job,involvedObject.name={job.name}")
+    return [event.message for event in api_response.items]
+
+
+@action_store.kubiya_action()
+def suspend_job(job: JobMeta):
+    api_client = get_batch_client()
+    api_response = api_client.read_namespaced_job(job.name, job.namespace)
+    api_response.spec.suspend = True
+    api_response = api_client.patch_namespaced_job(job.name, job.namespace, api_response)
+    return api_response
+
+@action_store.kubiya_action()
+def resume_job(job: JobMeta):
+    api_client = get_batch_client()
+    api_response = api_client.read_namespaced_job(job.name, job.namespace)
+    api_response.spec.suspend = False
+    api_response = api_client.patch_namespaced_job(job.name, job.namespace, api_response)
+    return api_response
+
+
+@action_store.kubiya_action()
+def wait_for_job_completion(job: JobCompletionMeta):
+    api_client = get_batch_client()
+    start_time = time.time()
+    while time.time() - start_time < job.timeout:
+        api_response = api_client.read_namespaced_job(job.name, job.namespace)
+        if api_response.status.succeeded is not None:
+            return {"status": "completed"}
+        time.sleep(5)
+    return {"status": "timeout"}
 
 @action_store.kubiya_action()
 def create_namespaced_job(job: Job):
@@ -103,7 +172,7 @@ def create_namespaced_job(job: Job):
         )
 
 @action_store.kubiya_action()
-def delete_namespaced_job(job: Job):
+def delete_namespaced_job(job: JobMeta):
     api_client = get_batch_client()
     try:
         api_response = api_client.delete_namespaced_job(
@@ -117,11 +186,11 @@ def delete_namespaced_job(job: Job):
         )
 
 @action_store.kubiya_action()
-def list_namespaced_jobs(args):
+def list_namespaced_jobs(namespace: Namespace):
     api_client = get_batch_client()
     jobs = []
     try:
-        api_response = api_client.list_namespaced_job(args.get("namespace"))
+        api_response = api_client.list_namespaced_job(namespace.namespace)
         logging.info(f"Job listed. response='{str(api_response)}")
         for item in api_response.items:
             jobs.append(item.metadata.name)
@@ -131,7 +200,7 @@ def list_namespaced_jobs(args):
         return {"error": f"Exception when calling BatchV1Api->list_namespaced_job: {e.body}"}
 
 @action_store.kubiya_action()
-def get_namespaced_job_logs(job: Job):
+def get_namespaced_job_logs(job: JobMeta):
     try:
         core_api_client = get_core_api_client()
         while True:
@@ -155,12 +224,7 @@ def get_namespaced_job_logs(job: Job):
         raise Exception(
             f"Exception when calling BatchV1Api->create_namespaced_job: {e}"
         )
-
-class JobMeta(BaseModel):
-    name: str
-    namespace: str = "openfaas-fn"
     
-
 @action_store.kubiya_action()
 def get_job_controller_uid(job: JobMeta):
     api_client = get_batch_client()
