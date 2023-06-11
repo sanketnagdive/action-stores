@@ -1,6 +1,7 @@
 from typing import Optional
 from kubernetes import client
 from pydantic import BaseModel
+from datetime import datetime
 
 from . import actionstore as action_store
 from .clients import get_core_api_client
@@ -11,6 +12,13 @@ from . import actionstore as action_store
 class ApplyObject(BaseModel):
     raw_data: str
     namespace: Optional[str] = None
+
+def convert_datetime(data):
+    for key, value in data.items():
+        if isinstance(value, dict):
+            convert_datetime(value)
+        elif isinstance(value, datetime):
+            data[key] = value.strftime("%Y-%m-%d %H:%M:%S")
 
 @action_store.kubiya_action()
 def apply_object(apply_object: ApplyObject):

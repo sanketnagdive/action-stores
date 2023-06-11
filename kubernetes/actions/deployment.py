@@ -3,6 +3,7 @@ import threading
 from pydantic import BaseModel
 from typing import Optional, Dict, Any, List
 from . import actionstore as action_store, clients
+from .utils import convert_datetime
 from kubernetes import client
 import logging
 import json
@@ -70,8 +71,15 @@ def describe_deployment(deployment_info: DeploymentInfo):
             name=deployment_info.deployment_name,
             namespace=deployment_info.namespace
         )
+
+        # Convert V1Deployment to dictionary
+        deployment_dict = api_response.to_dict()
+
+        # Convert datetime objects to strings
+        deployment_dict = convert_datetime(deployment_dict)
+
         # Return the deployment as a JSON string
-        return json.dumps(api_response.to_dict())
+        return json.dumps(deployment_dict)
     except client.rest.ApiException as e:
         return {"error": e.reason}
 
@@ -215,17 +223,6 @@ def rollout_status(deployment_info: Deployment):
         },
     }
 
-
-@action_store.kubiya_action()
-def describe_deployment(params):
-    api_client = clients.get_apps_client()
-    logger.info("Getting deployment " + params["deployment"])
-    api_response = api_client.read_namespaced_deployment(
-        name=params["deployment"], namespace=params["namespace"]
-    )
-    # Return the deployment as a JSON string
-    logger.info("Returning deployment " + params["deployment"])
-    return json.dumps(api_response.to_dict())
 
 @action_store.kubiya_action()
 def rollout_restart_deployment(params: Deployment):
