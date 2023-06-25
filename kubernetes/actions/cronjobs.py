@@ -121,3 +121,4 @@ def disable_cronjobs(args: CronjobsDisableInput):
     if failed:
         return {"success": success, "failed": failed, "error": failed}
     return {"success": success, "failed": failed}
+
