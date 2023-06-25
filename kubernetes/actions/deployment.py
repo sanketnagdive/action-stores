@@ -21,6 +21,15 @@ class DeploymentReplicasInput(BaseModel):
     namespace: Optional[str] = "default"
     replicas: Optional[int] = None
 
+class DeploymentReplicasInputSingle(BaseModel):
+    deployment_name: Optional[str] = None
+    replicas: Optional[int] = None
+
+class DeploymentsReplicasInput(BaseModel):
+    namespace: Optional[str] = "default"
+    inputs: List[DeploymentReplicasInputSingle]
+
+
 class DeploymentImageInput(BaseModel):
     deployment_name: Optional[str] = None
     namespace: Optional[str] = "default"
@@ -317,7 +326,35 @@ def scale_deployment(params: DeploymentReplicasInput):
     except api_client.rest.ApiException as e:
         logger.error(e.reason)
         return {"error": e.reason}
-    
+
+@action_store.kubiya_action()
+def scale_deployments(params: DeploymentsReplicasInput):
+    logger.info(f"Scaling {len(params.inputs)} deployments")
+    res_dict = {}
+    for i, _input in enumerate(params.inputs):
+        logger.info(f"Scaling deployment {i+1}/{len(params.inputs)}...")
+        scale_input = DeploymentReplicasInput(
+            deployment_name=_input.deployment_name,
+            namespace=params.namespace,
+            replicas=_input.replicas,
+        )
+        res = scale_deployment(scale_input)
+        res_dict[_input.deployment_name] = res
+
+    success = []
+    failed = []
+    for deployment_name, res in res_dict.items():
+        e = res.get("error")
+        if e is not None:
+            failed.append({"deployment": deployment_name, "namespace": params.namespace, "error": e})
+        else:
+            success.append({"deployment": deployment_name, "namespace": params.namespace})
+
+    logger.info(f"Finished scaling deployments")
+    if failed:
+        return {"success": success, "failed": failed, "error": failed}
+    return {"success": success, "failed": failed}
+
 @action_store.kubiya_action()
 def delete_deployment(params: Deployment):
     try:
