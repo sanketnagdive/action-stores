@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from models.common import SimpleResponse
+from .common import SimpleResponse
 from typing import List
 
 
