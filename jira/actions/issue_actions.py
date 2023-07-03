@@ -1,4 +1,5 @@
 from ..jira_wrapper import get_jira_instance
+from atlassian import Jira
 from ..models.issue import CreateIssueParams, CreateIssueResponse, \
     CommentIssueParams, CommentIssueResponse, \
     UpdateIssueParams, AssignIssueParams, \
@@ -6,8 +7,33 @@ from ..models.issue import CreateIssueParams, CreateIssueResponse, \
     GetAllIssuesParams, GetAllIssuesResponse, \
     LinkIssuesParams, LinkIssuesResponse, \
     TransitionIssueParams, TransitionIssueResponse
+from ..models.jql import RunJQLParams, RunJQLResponse
 from ..models.common import SimpleResponse
 from .. import action_store as action_store
+
+def get_jira_url(issue_key: str, jira_instance: Jira) -> str:
+    return jira_instance.url + '/browse/' + issue_key
+
+@action_store.kubiya_action()
+def create_issue(request: CreateIssueParams) -> CreateIssueResponse:
+    jira = get_jira_instance()
+    issue = jira.issue_create(
+        fields={
+            "project": {"key": request.project_key},
+            "issuetype": {"name": request.issue_type_name},
+            "summary": request.summary,
+            "description": request.description,
+        }
+    )
+    issue_url = get_jira_url(issue['key'], jira)
+    return CreateIssueResponse(issue_url=issue_url, **issue)
+
+@action_store.kubiya_action()
+def run_jql(request: RunJQLParams) -> RunJQLResponse:
+    jira = get_jira_instance()
+    issues = jira.search_issues(request.jql_query)
+    return RunJQLResponse(issues=issues)
+
 
 @action_store.kubiya_action()
 def create_issue(request: CreateIssueParams) -> CreateIssueResponse:
