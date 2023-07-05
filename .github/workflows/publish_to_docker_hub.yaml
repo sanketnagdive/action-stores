@@ -24,14 +24,13 @@ jobs:
           set -e
           LAST_COMMIT=$(git rev-parse HEAD~1 2>/dev/null)
           if [ -z "$LAST_COMMIT" ]; then
-            # If there's no commit to compare with, compare the current commit with an empty tree
             echo "No commit found to compare with. Using empty tree commit hash."
             LAST_COMMIT=4b825dc642cb6eb9a060e54bf8d69288fbee4904
           fi
           echo "Comparing with commit: $LAST_COMMIT"
           echo "Git diff output:"
           git diff --dirstat=files,0 $LAST_COMMIT..HEAD
-          echo "::set-output name=dirs::$(git diff --dirstat=files,0 $LAST_COMMIT..HEAD | awk '!/^\\./ {print $2}')"
+          echo "::set-output name=dirs::$(git diff --dirstat=files,0 $LAST_COMMIT..HEAD | awk '!/^\\./ {print $2}' | sed 's:/*$::')"
           echo "Changed directories:"
           echo ${{ steps.getchange.outputs.dirs }}
       - name: Bundle and send changes
