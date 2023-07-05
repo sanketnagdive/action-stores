@@ -44,6 +44,7 @@ jobs:
                 \"action\": \"build_from_json\",
                 \"input\": {
                   \"image\": \"kubiya/action-store-$dir\",
+                  \"organization\": \"kubiya-ai\",
                   \"source_context\": \"$ENCODED_CONTENT\"
                 }
               }"
