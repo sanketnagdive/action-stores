@@ -4,3 +4,4 @@ def get_jira_secrets():
     username = action_store.secrets.get("JIRA_USERNAME")
     password = action_store.secrets.get("JIRA_PASSWORD")
     return url, username, password
+    
