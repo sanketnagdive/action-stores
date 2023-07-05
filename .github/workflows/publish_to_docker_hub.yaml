@@ -59,7 +59,9 @@ jobs:
             if [ -f "$file" ]; then
               echo "File exists. Creating tar file."
               BASENAME=$(basename "$file")
-              tar -czf changes.tar.gz "$file"
+              DIRNAME=$(dirname "$file")
+              IMAGE_NAME="kubiya/action-store-${DIRNAME////-}"
+              tar -czf changes.tar.gz -C "$DIRNAME" "$BASENAME"
               if [ -s changes.tar.gz ]; then
                   echo "Tar file created. Sending request to Kubiya API."
                   ENCODED_CONTENT=$(base64 -w 0 changes.tar.gz)
@@ -69,17 +71,14 @@ jobs:
                   -d "{
                     \"action\": \"build\",
                     \"input\": {
-                      \"image\": \"kubiya/action-store\",
+                      \"image\": \"$IMAGE_NAME\",
                       \"source_context\": \"$ENCODED_CONTENT\"
                     }
                   }")
                   if [ $RESPONSE -eq 200 ]; then
-                    echo "Request successful."
-                    echo "API Response:"
-                    cat output.json
+                    echo "Request sent successfully."
                   else
-                    echo "Request failed with HTTP status code: $RESPONSE"
-                    echo "API Response:"
+                    echo "Request failed. Response:"
                     cat output.json
                     exit 1
                   fi
