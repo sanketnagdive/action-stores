@@ -1,4 +1,3 @@
-
 name: Publish to Docker Hub
 
 on:
@@ -37,7 +36,7 @@ jobs:
             if [ -d "$dir" ]; then
               tar -czf changes.tar.gz $dir
               ENCODED_CONTENT=$(base64 -w 0 changes.tar.gz)
-              curl -X POST https://api.kubiya.ai/api/v1/function/function_builder&organization=kubiya-ai \
+              curl -X POST "https://api.kubiya.ai/api/v1/function/function_builder?organization=kubiya-ai" \
               -H "Content-Type: application/json" \
               -H "Authorization: ApiKey ${KUBIYA_API_KEY}" \
               -d "{
