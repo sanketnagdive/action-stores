@@ -46,7 +46,7 @@ def get_repo_files(params: GetRepoFilesParams) -> GetRepoFilesResponse:
         entity = get_entity(github)
         repo = entity.get_repo(params.repo_name)
         contents = repo.get_contents("")
-        files = [content.path for content in contents if isinstance(content, ContentFile.FileContent)]
+        files = [content.path for content in contents if isinstance(content, ContentFile.ContentFile)]
         return GetRepoFilesResponse(files=files)
     except GithubException as e:
         logger.error(f"Failed to get repository files: {e}")
@@ -80,8 +80,6 @@ def get_repo_branches(params: GetRepoBranchesParams) -> GetRepoBranchesResponse:
     except GithubException as e:
         logger.error(f"Failed to get repository branches: {e}")
         raise
-
-
 
 @action_store.kubiya_action()
 def list_repos(params: ListRepositoriesParams) -> ListRepositoriesResponse:
