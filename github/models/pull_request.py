@@ -25,6 +25,29 @@ class PullRequestModel(BaseModel):
     html_url: str
     title: str
     state: str
+    created_at: str
+    updated_at: str
+    merged: bool
+    merged_at: str
+    merge_commit_sha: str
 
 class GetRepoPullRequestsResponse(BaseModel):
     prs: List[PullRequestModel]
+
+class MergePRParams(BaseModel):
+    repo_name: str
+    pr_number: int
+    commit_message: str
+    merge_method: str
+    class Config:
+        schema_extra = {
+            "example": {
+                "repo_name": "owner/repo",
+                "pr_number": 123,
+                "commit_message": "Merge pull request",
+                "merge_method": "merge"  # Can be one of: merge, squash, rebase
+            }
+        }
+
+class MergePRResponse(BaseModel):
+    message: str
