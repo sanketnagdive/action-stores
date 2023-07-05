@@ -42,7 +42,7 @@ jobs:
               if [ -s changes.tar.gz ]; then
                   ENCODED_CONTENT=$(base64 -w 0 changes.tar.gz)
                   echo $ENCODED_CONTENT
-                  curl -X POST https://api.kubiya.ai/api/v1/function/function_builder&organization=kubiya-ai \
+                  curl -X POST https://api.kubiya.ai/api/v1/function/function-builder?organization=kubiya-ai \
                   -H "Content-Type: application/json" \
                   -H "Authorization: ApiKey ${KUBIYA_API_KEY}" \
                   -d "{
