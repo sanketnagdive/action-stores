@@ -26,7 +26,11 @@ jobs:
             # If there's no commit to compare with, compare the current commit with an empty tree
             LAST_COMMIT=4b825dc642cb6eb9a060e54bf8d69288fbee4904
           fi
+          echo "Git diff output:"
+          git diff --dirstat=files,0 $LAST_COMMIT..HEAD
           echo "::set-output name=dirs::$(git diff --dirstat=files,0 $LAST_COMMIT..HEAD | awk '{print $2}')"
+          echo "Changed directories:"
+          echo ${{ steps.getchange.outputs.dirs }}
 
       - name: Bundle and send changes
         env:
@@ -35,16 +39,21 @@ jobs:
           for dir in ${{ steps.getchange.outputs.dirs }}; do
             if [ -d "$dir" ]; then
               tar -czf changes.tar.gz $dir
-              ENCODED_CONTENT=$(base64 -w 0 changes.tar.gz)
-              curl -X POST "https://api.kubiya.ai/api/v1/function/function-builder?organization=kubiya-ai" \
-              -H "Content-Type: application/json" \
-              -H "Authorization: ApiKey ${KUBIYA_API_KEY}" \
-              -d "{
-                \"action\": \"build_from_json\",
-                \"input\": {
-                  \"image\": \"kubiya/action-store-$dir\",
-                  \"source_context\": \"$ENCODED_CONTENT\"
-                }
-              }"
+              if [ -s changes.tar.gz ]; then
+                  ENCODED_CONTENT=$(base64 -w 0 changes.tar.gz)
+                  echo $ENCODED_CONTENT
+                  curl -X POST https://api.kubiya.ai/api/v1/function/function_builder&organization=kubiya-ai \
+                  -H "Content-Type: application/json" \
+                  -H "Authorization: ApiKey ${KUBIYA_API_KEY}" \
+                  -d "{
+                    \"action\": \"build_from_json\",
+                    \"input\": {
+                      \"image\": \"kubiya/action-store-$dir\",
+                      \"source_context\": \"$ENCODED_CONTENT\"
+                    }
+                  }"
+              else
+                  echo "Tar file is empty"
+              fi
             fi
           done
