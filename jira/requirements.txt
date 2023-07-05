@@ -1,0 +1,4 @@
+kubiya
+pydantic
+requests
+atlassian-python-api
