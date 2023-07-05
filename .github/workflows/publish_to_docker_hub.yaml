@@ -47,7 +47,7 @@ jobs:
               BASENAME=$(basename "$file")
               DIRNAME=$(dirname "$file")
               if [ "$DIRNAME" != "." ]; then
-                IMAGE_NAME="kubiya/action-store-${DIRNAME////-}"
+                IMAGE_NAME="kubiya/action-store-$(dirname "$file" | sed 's/\//-/g')"
                 tar -czf changes.tar.gz -C "$DIRNAME" "$BASENAME"
                 if [ -s changes.tar.gz ]; then
                   echo "Tar file created. Sending request to Kubiya API."
