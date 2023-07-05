@@ -37,14 +37,13 @@ jobs:
             if [ -d "$dir" ]; then
               tar -czf changes.tar.gz $dir
               ENCODED_CONTENT=$(base64 -w 0 changes.tar.gz)
-              curl -X POST https://api.kubiya.ai/api/v1/function/function_builder \
+              curl -X POST https://api.kubiya.ai/api/v1/function/function_builder&organization=kubiya-ai \
               -H "Content-Type: application/json" \
               -H "Authorization: ApiKey ${KUBIYA_API_KEY}" \
               -d "{
                 \"action\": \"build_from_json\",
                 \"input\": {
                   \"image\": \"kubiya/action-store-$dir\",
-                  \"organization\": \"kubiya-ai\",
                   \"source_context\": \"$ENCODED_CONTENT\"
                 }
               }"
