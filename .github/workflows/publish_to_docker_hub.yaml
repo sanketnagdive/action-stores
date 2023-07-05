@@ -39,7 +39,7 @@ jobs:
               ENCODED_CONTENT=$(base64 -w 0 changes.tar.gz)
               curl -X POST https://api.kubiya.ai/api/v1/function/function_builder \
               -H "Content-Type: application/json" \
-              -H "Authorization: Bearer ${KUBIYA_API_KEY}" \
+              -H "Authorization: ApiKey ${KUBIYA_API_KEY}" \
               -d "{
                 \"action\": \"build_from_json\",
                 \"input\": {
