@@ -1,0 +1,43 @@
+name: Publish to Docker Hub
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Environment
+        run: sudo apt-get install -y curl jq
+
+      - name: Get changed directories
+        id: getchange
+        run: |
+          echo "::set-output name=dirs::$(git diff --dirstat=files,0 HEAD~1..HEAD | awk '{print $2}')"
+
+      - name: Bundle and send changes
+        env:
+          KUBIYA_API_KEY: ${{ secrets.KUBIYA_API_KEY }}
+        run: |
+          for dir in ${{ steps.getchange.outputs.dirs }}; do
+            if [ -d "$dir" ]; then
+              tar -czf changes.tar.gz $dir
+              ENCODED_CONTENT=$(base64 -w 0 changes.tar.gz)
+              curl -X POST https://api.kubiya.ai/function/function_builder \
+              -H "Content-Type: application/json" \
+              -H "Authorization: Bearer ${KUBIYA_API_KEY}" \
+              -d "{
+                \"action\": \"build_from_json\",
+                \"input\": {
+                  \"image\": \"kubiya/action-store-$dir\",
+                  \"source_context\": \"$ENCODED_CONTENT\"
+                }
+              }"
+            fi
+          done
