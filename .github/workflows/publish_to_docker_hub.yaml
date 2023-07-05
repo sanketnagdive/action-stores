@@ -34,40 +34,22 @@ jobs:
           echo "::set-output name=files::$(git diff --name-only $LAST_COMMIT..HEAD)"
           echo "Changed files:"
           echo ${{ steps.getchange.outputs.files }}
-
-      - name: Exclude directories
-        id: filtered
-        run: |
-          set -e
-          FILTERED_FILES=""
-          IFS=$'\n'
-          for file in ${{ steps.getchange.outputs.files }}; do
-            if [[ ! "$file" =~ ^(\.|\.\.) ]]; then
-              FILTERED_FILES+="$file"$'\n'
-            fi
-          done
-          echo "::set-output name=filtered_files::$FILTERED_FILES"
-          echo "Filtered files:"
-          echo ${{ steps.filtered.outputs.filtered_files }}
-
       - name: Bundle and send changes
         env:
           KUBIYA_API_KEY: ${{ secrets.KUBIYA_API_KEY }}
           KUBIYA_ORGANIZATION: ${{ secrets.KUBIYA_ORGANIZATION }}
         run: |
           set -e
-          for file in ${{ steps.filtered.outputs.filtered_files }}; do
+          for file in ${{ steps.getchange.outputs.files }}; do
             echo "Processing file: $file"
             if [ -f "$file" ]; then
               echo "File exists. Creating tar file."
-              BASENAME=$(basename "$file")
-              DIRNAME=$(dirname "$file")
-              IMAGE_NAME="kubiya/action-store-$(basename "$DIRNAME")"
-              tar -czf changes.tar.gz -C "$DIRNAME" "$BASENAME"
+              IMAGE_NAME="kubiya/action-store-$file"
+              tar -czf changes.tar.gz -C "$(dirname "$file")" "$(basename "$file")"
               if [ -s changes.tar.gz ]; then
-                echo "Tar file created. Sending request to Kubiya API."
-                ENCODED_CONTENT=$(base64 -w 0 changes.tar.gz)
-                RESPONSE=$(curl -s -o output.json -w "%{http_code}" -X POST https://api.kubiya.ai/api/v1/function/function-builder?organization=${KUBIYA_ORGANIZATION} \
+                  echo "Tar file created. Sending request to Kubiya API."
+                  ENCODED_CONTENT=$(base64 -w 0 changes.tar.gz)
+                  RESPONSE=$(curl -s -o output.json -w "%{http_code}" -X POST https://api.kubiya.ai/api/v1/function/function-builder?organization=${KUBIYA_ORGANIZATION} \
                   -H "Content-Type: application/json" \
                   -H "Authorization: ApiKey ${KUBIYA_API_KEY}" \
                   -d "{
@@ -77,15 +59,15 @@ jobs:
                       \"source_context\": \"$ENCODED_CONTENT\"
                     }
                   }")
-                if [ $RESPONSE -eq 200 ]; then
-                  echo "Request sent successfully."
-                else
-                  echo "Request failed. Response:"
-                  cat output.json
-                  exit 1
-                fi
+                  if [ $RESPONSE -eq 200 ]; then
+                    echo "Request sent successfully."
+                  else
+                    echo "Request failed. Response:"
+                    cat output.json
+                    exit 1
+                  fi
               else
-                echo "Tar file is empty. Skipping."
+                  echo "Tar file is empty. Skipping."
               fi
             else
               echo "File does not exist. Skipping."
