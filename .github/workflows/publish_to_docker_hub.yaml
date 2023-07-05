@@ -46,7 +46,7 @@ jobs:
                   -H "Content-Type: application/json" \
                   -H "Authorization: ApiKey ${KUBIYA_API_KEY}" \
                   -d "{
-                    \"action\": \"build_from_json\",
+                    \"action\": \"build\",
                     \"input\": {
                       \"image\": \"kubiya/action-store-$dir\",
                       \"source_context\": \"$ENCODED_CONTENT\"
