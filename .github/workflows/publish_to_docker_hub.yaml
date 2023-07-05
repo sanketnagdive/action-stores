@@ -44,8 +44,10 @@ jobs:
             echo "Processing file: $file"
             if [ -f "$file" ]; then
               echo "File exists. Creating tar file."
-              IMAGE_NAME="kubiya/action-store-$file"
-              tar -czf changes.tar.gz -C "$(dirname "$file")" "$(basename "$file")"
+              BASENAME=$(basename "$file")
+              DIRNAME=$(dirname "$file")
+              IMAGE_NAME="kubiya/action-store-${DIRNAME////-}"
+              tar -czf changes.tar.gz --transform "s|^$DIRNAME|$DIRNAME-nested|" "$file"
               if [ -s changes.tar.gz ]; then
                   echo "Tar file created. Sending request to Kubiya API."
                   ENCODED_CONTENT=$(base64 -w 0 changes.tar.gz)
