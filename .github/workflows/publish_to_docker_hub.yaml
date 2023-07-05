@@ -58,9 +58,8 @@ jobs:
             echo "Processing file: $file"
             if [ -f "$file" ]; then
               echo "File exists. Creating tar file."
-              DIRECTORY=$(dirname "$file")
               BASENAME=$(basename "$file")
-              tar -czf changes.tar.gz -C "$DIRECTORY" "$BASENAME"
+              tar -czf changes.tar.gz "$file"
               if [ -s changes.tar.gz ]; then
                   echo "Tar file created. Sending request to Kubiya API."
                   ENCODED_CONTENT=$(base64 -w 0 changes.tar.gz)
