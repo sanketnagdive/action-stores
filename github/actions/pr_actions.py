@@ -36,7 +36,8 @@ def get_pr_details(params: GetPRDetailsParams) -> GetPRDetailsResponse:
 def get_repo_pull_requests(params: GetRepoPullRequestsParams) -> GetRepoPullRequestsResponse:
     try:
         github = get_github_instance()
-        repo = github.get_repo(params.repo_name)
+        entity = get_entity(github)
+        repo = entity.get_repo(params.repo_name)
         prs = [pr for pr in repo.get_pulls(state=params.state)]
         return GetRepoPullRequestsResponse(prs=prs)
     except GithubException as e:
