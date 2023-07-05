@@ -1,4 +1,4 @@
-name: Publish Action Store changes
+name: Publish action store changes
 
 on:
   push:
@@ -46,10 +46,8 @@ jobs:
               echo "Directory exists. Creating tar file."
               tar -czf changes.tar.gz $dir
               if [ -s changes.tar.gz ]; then
-                  echo "Tar file created. Encoding content."
+                  echo "Tar file created. Sending request to Kubiya API."
                   ENCODED_CONTENT=$(base64 -w 0 changes.tar.gz)
-                  echo $ENCODED_CONTENT
-                  echo "Sending request to Kubiya API."
                   RESPONSE=$(curl -s -o output.json -w "%{http_code}" -X POST https://api.kubiya.ai/api/v1/function/function-builder?organization=${KUBIYA_ORGANIZATION} \
                   -H "Content-Type: application/json" \
                   -H "Authorization: ApiKey ${KUBIYA_API_KEY}" \
@@ -62,8 +60,11 @@ jobs:
                   }")
                   if [ $RESPONSE -eq 200 ]; then
                     echo "Request successful."
+                    echo "API Response:"
+                    cat output.json
                   else
                     echo "Request failed with status $RESPONSE"
+                    echo "API Response:"
                     cat output.json
                   fi
               else
