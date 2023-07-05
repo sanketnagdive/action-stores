@@ -46,9 +46,10 @@ jobs:
               echo "File exists. Creating tar file."
               BASENAME=$(basename "$file")
               DIRNAME=$(dirname "$file")
-              IMAGE_NAME="kubiya/action-store-${DIRNAME////-}"
-              tar -czf changes.tar.gz --transform "s|^$DIRNAME|$DIRNAME-nested|" "$file"
-              if [ -s changes.tar.gz ]; then
+              if [ "$DIRNAME" != "." ]; then
+                IMAGE_NAME="kubiya/action-store-${DIRNAME////-}"
+                tar -czf changes.tar.gz -C "$DIRNAME" "$BASENAME"
+                if [ -s changes.tar.gz ]; then
                   echo "Tar file created. Sending request to Kubiya API."
                   ENCODED_CONTENT=$(base64 -w 0 changes.tar.gz)
                   RESPONSE=$(curl -s -o output.json -w "%{http_code}" -X POST https://api.kubiya.ai/api/v1/function/function-builder?organization=${KUBIYA_ORGANIZATION} \
@@ -68,8 +69,11 @@ jobs:
                     cat output.json
                     exit 1
                   fi
-              else
+                else
                   echo "Tar file is empty. Skipping."
+                fi
+              else
+                echo "Skipping main directory."
               fi
             else
               echo "File does not exist. Skipping."
