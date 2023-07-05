@@ -1,4 +1,4 @@
-name: Publish to Docker Hub
+name: Publish Action Store changes
 
 on:
   push:
@@ -21,28 +21,36 @@ jobs:
       - name: Get changed directories
         id: getchange
         run: |
+          set -e
           LAST_COMMIT=$(git rev-parse HEAD~1 2>/dev/null)
           if [ -z "$LAST_COMMIT" ]; then
             # If there's no commit to compare with, compare the current commit with an empty tree
+            echo "No commit found to compare with. Using empty tree commit hash."
             LAST_COMMIT=4b825dc642cb6eb9a060e54bf8d69288fbee4904
           fi
+          echo "Comparing with commit: $LAST_COMMIT"
           echo "Git diff output:"
           git diff --dirstat=files,0 $LAST_COMMIT..HEAD
-          echo "::set-output name=dirs::$(git diff --dirstat=files,0 $LAST_COMMIT..HEAD | awk '{print $2}')"
+          echo "::set-output name=dirs::$(git diff --dirstat=files,0 $LAST_COMMIT..HEAD | awk '!/^\\./ {print $2}')"
           echo "Changed directories:"
           echo ${{ steps.getchange.outputs.dirs }}
-
       - name: Bundle and send changes
         env:
           KUBIYA_API_KEY: ${{ secrets.KUBIYA_API_KEY }}
+          KUBIYA_ORGANIZATION: ${{ secrets.KUBIYA_ORGANIZATION }}
         run: |
+          set -e
           for dir in ${{ steps.getchange.outputs.dirs }}; do
+            echo "Processing directory: $dir"
             if [ -d "$dir" ]; then
+              echo "Directory exists. Creating tar file."
               tar -czf changes.tar.gz $dir
               if [ -s changes.tar.gz ]; then
+                  echo "Tar file created. Encoding content."
                   ENCODED_CONTENT=$(base64 -w 0 changes.tar.gz)
                   echo $ENCODED_CONTENT
-                  curl -X POST https://api.kubiya.ai/api/v1/function/function-builder?organization=kubiya-ai \
+                  echo "Sending request to Kubiya API."
+                  RESPONSE=$(curl -s -o output.json -w "%{http_code}" -X POST https://api.kubiya.ai/api/v1/function/function-builder?organization=${KUBIYA_ORGANIZATION} \
                   -H "Content-Type: application/json" \
                   -H "Authorization: ApiKey ${KUBIYA_API_KEY}" \
                   -d "{
@@ -51,9 +59,17 @@ jobs:
                       \"image\": \"kubiya/action-store-$dir\",
                       \"source_context\": \"$ENCODED_CONTENT\"
                     }
-                  }"
+                  }")
+                  if [ $RESPONSE -eq 200 ]; then
+                    echo "Request successful."
+                  else
+                    echo "Request failed with status $RESPONSE"
+                    cat output.json
+                  fi
               else
-                  echo "Tar file is empty"
+                  echo "Tar file is empty. Skipping."
               fi
+            else
+              echo "Directory does not exist. Skipping."
             fi
           done
