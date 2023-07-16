@@ -8,7 +8,7 @@ def health_check():
     org = action_store.secrets["BITBUCKET_SPACE"]
     user = action_store.secrets["BITBUCKET_USERNAME"]
     pwd = action_store.secrets["BITBUCKET_APP_PASSWORD"]
-    return _param(user) & _param(pwd) & _param(org) & _conn(org)
+    return _param(user) and _param(pwd) and _param(org) and _conn(org)
 
 def _conn(v: str) -> bool:
     try:
@@ -20,5 +20,5 @@ def _conn(v: str) -> bool:
 
 
 def _param(p: str) -> bool:
-    return p is not None & p != ""
+    return p is not None and p != ""
 

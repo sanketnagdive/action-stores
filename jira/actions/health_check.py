@@ -5,7 +5,7 @@ from ..jira_wrapper import get_jira_instance
 
 def health_check():
     url, user, pwd = get_jira_secrets()
-    return _param(url) & _param(user) & _param(pwd) & _conn()
+    return _param(url) and _param(user) and _param(pwd) and _conn()
 
 
 def _conn() -> bool:
@@ -18,5 +18,5 @@ def _conn() -> bool:
 
 
 def _param(p: str) -> bool:
-    return p is not None & p != ""
+    return p is not None and p != ""
 

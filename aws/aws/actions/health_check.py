@@ -8,7 +8,7 @@ def health_check():
     session = action_store.secrets.get("AWS_SESSION_TOKEN")
     secret = action_store.secrets.get("AWS_SECRET_ACCESS_KEY")
     
-    return _param(key) & _param(secret) & _param(region) & _param(session) & _conn()
+    return _param(key) and _param(secret) and _param(region) and _param(session) and _conn()
 
 
 def _conn() -> bool:
@@ -27,4 +27,4 @@ def _conn() -> bool:
 
 
 def _param(p: str) -> bool:
-    return p is not None & p != ""
+    return p is not None and p != ""
