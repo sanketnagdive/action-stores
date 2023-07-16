@@ -1,11 +1,11 @@
 import logging as log
 from github import Github
-from .. import action_store
+from ..secrets import get_github_token, get_github_organization
 
 def health_check():
     p = {
-        "token": action_store.secrets.get("GITHUB_TOKEN"),
-        "org": action_store.secrets.get("GITHUB_ORGANIZATION")
+        "token": get_github_token(),
+        "org": get_github_organization()
     }
     
     valid_org = param_check(p["org"])
