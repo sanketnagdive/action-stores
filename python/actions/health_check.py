@@ -1,7 +1,7 @@
 from .interpreter import execute_python_code
 import logging as log
 
-def health_check():
+def health_check() -> bool:
     output = True
     excepted='run python code'
     code = 'print("run python code")'
