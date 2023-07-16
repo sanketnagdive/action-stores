@@ -14,7 +14,7 @@ def health_check():
     valid_user = param_check(p["user"])
     valid_pass = param_check(p["pass"])
     valid_space = param_check(p["sapce"])
-    valid_user_login = user_login_check(p["token"])
+    valid_user_login = user_login_check(p["sapce"])
     
     return valid_user | valid_pass | valid_space | valid_user_login
 
