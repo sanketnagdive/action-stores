@@ -14,7 +14,7 @@ class HealthResponse(BaseModel):
     errors: List[str]
 
 @action_store.kubiya_action()
-def health_check(params: HealthRequest) -> HealthResponse:
+def health_check(_) -> HealthResponse:
     errors = []
     valid_params = True
     token = get_github_token()

@@ -1,10 +1,20 @@
 import logging as log
+from typing import List
+
+from pydantic import BaseModel
 from . import actionstore as action_store
 from .interpreter import execute_python_code
 
+class HealthRequest(BaseModel):
+    pass
+
+class HealthResponse(BaseModel):
+    params: bool
+    connection: bool
+    errors: List[str]
 
 @action_store.kubiya_action()
-def health_check() -> bool:
+def health_check(_) -> HealthResponse:
     output = True
     excepted='run python code'
     code = 'print("run python code")'
@@ -13,6 +23,6 @@ def health_check() -> bool:
     if 'error' in result:
         log.error("Error: - %s", result['error'])
         log.error("Traceback: - %s", result['traceback'])
-        return False
+        return HealthResponse(params=True, connection=False, errors=[result['error']])
     else:
-        return excepted in result['output']
+        return HealthResponse(params=True, connection=excepted in result['output'])
