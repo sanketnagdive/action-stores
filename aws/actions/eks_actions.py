@@ -1,4 +1,4 @@
-from ..models.eks_models import (
+from models.eks_models import (
     CreateClusterRequest,
     CreateClusterResponse,
     DeleteClusterRequest,

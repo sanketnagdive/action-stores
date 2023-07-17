@@ -11,7 +11,6 @@ from ..models.ecs_models import (
 from ..main_store import store
 from ..aws_wrapper import get_resource
 
-
 @store.kubiya_action()
 def register_task_definition(request: RegisterTaskDefinitionRequest) -> RegisterTaskDefinitionResponse:
     """
