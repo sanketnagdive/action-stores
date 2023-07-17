@@ -3,7 +3,8 @@ from typing import List
 import boto3
 from pydantic import BaseModel
 
-from . import action_store as s
+from ..main_store import store as s
+# from ..aws.actions import action_store as s
 
 
 class HealthRequest(BaseModel):
@@ -28,10 +29,10 @@ def _validate_conn(e: List[str]) -> bool:
     try:
         c = boto3.client(
             "ecs",
-            aws_access_key_id=s.secrets.get("AWS_ACCESS_KEY_ID"),
-            aws_secret_access_key=s.secrets.get("AWS_SECRET_ACCESS_KEY"),
-            aws_session_token=s.secrets.get("AWS_SESSION_TOKEN"),
-            region_name=s.secrets.get("AWS_DEFAULT_REGION"),
+            aws_access_key_id=s.secrets["AWS_ACCESS_KEY_ID"],
+            aws_secret_access_key=s.secrets["AWS_SECRET_ACCESS_KEY"],
+            aws_session_token=s.secrets["AWS_SESSION_TOKEN"],
+            region_name=s.secrets["AWS_DEFAULT_REGION"],
         )
         return c.list_clusters().get("clusterArns") is not None
     except Exception as e:
