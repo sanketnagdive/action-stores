@@ -1,8 +1,10 @@
 import logging as log
+from .. import action_store
 from ..github_wrapper import get_github_instance, get_entity
 from ..secrets import get_github_token, get_github_organization
 
 
+@action_store.kubiya_action()
 def health_check():
     pwd = get_github_token()
     org = get_github_organization()

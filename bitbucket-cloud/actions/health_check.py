@@ -4,6 +4,7 @@ from . import action_store
 from .bitbucket_actions import get_client
 
 
+@action_store.kubiya_action()
 def health_check():    
     org = action_store.secrets["BITBUCKET_SPACE"]
     user = action_store.secrets["BITBUCKET_USERNAME"]

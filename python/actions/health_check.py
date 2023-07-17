@@ -1,6 +1,9 @@
-from .interpreter import execute_python_code
 import logging as log
+from . import actionstore as action_store
+from .interpreter import execute_python_code
 
+
+@action_store.kubiya_action()
 def health_check() -> bool:
     output = True
     excepted='run python code'

@@ -1,7 +1,11 @@
 import logging as log
+from . import action_store
 from .secrets import get_secrets
 from .plugins import list_jenkins_plugins
 
+
+
+@action_store.kubiya_action()
 def health_check():
     host, user, pwd = get_secrets()
     return _param(host) and _param(user) and _param(pwd) and _conn()

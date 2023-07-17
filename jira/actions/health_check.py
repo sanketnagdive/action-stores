@@ -1,8 +1,10 @@
 import logging as log
+from .. import action_store
 from ..secrets import get_jira_secrets
 from ..jira_wrapper import get_jira_instance
 
 
+@action_store.kubiya_action()
 def health_check():
     url, user, pwd = get_jira_secrets()
     return _param(url) and _param(user) and _param(pwd) and _conn()

@@ -2,6 +2,8 @@ import boto3
 import logging as log
 from . import action_store
 
+
+@action_store.kubiya_action()
 def health_check():
     key = action_store.secrets.get("AWS_ACCESS_KEY_ID")
     region = action_store.secrets.get("AWS_DEFAULT_REGION")

@@ -1,6 +1,9 @@
 import logging as log
+from . import actionstore as action_store
 from .clients import get_batch_client, get_core_api_client, get_apps_client
 
+
+@action_store.kubiya_action()
 def health_check():
     apps = get_apps_client()
     batch = get_batch_client()
