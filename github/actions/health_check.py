@@ -1,11 +1,8 @@
-import logging
 from typing import List
 from .. import action_store
 from pydantic import BaseModel
+from .. import action_store as s
 from ..github_wrapper import get_github_instance, get_entity
-from ..secrets import get_github_token, get_github_organization
-
-logger = logging.getLogger(__name__)
 
 
 class HealthRequest(BaseModel):
@@ -18,33 +15,33 @@ class HealthResponse(BaseModel):
     errors: List[str]
 
 
-@action_store.kubiya_action()
-def health_check(_) -> HealthResponse:
-    errors = []
-    valid_params = True
-
-    token = action_store.secrets.get("GITHUB_TOKEN")
-    org = action_store.secrets.get("GITHUB_ORGANIZATION")
-    if _param(token) or _param(org):
-        if _param(org):
-            errors.append("GITHUB_ORGANIZATION is not set")
-        if _param(token):
-            errors.append("GITHUB_TOKEN is not set")
-        valid_params = False
-
-    valid_connection = _conn(pwd=token, org=org, errs=errors)
-    return HealthResponse(params=valid_params, connection=valid_connection, errors=errors)
+@s.kubiya_action()
+def health_check(_: HealthRequest) -> HealthResponse:
+    errors = List[str]
+    params = _validate_params(errors)
+    connection = _validate_conn(errors)
+    return HealthResponse(params=params, connection=connection, errors=errors)
 
 
-def _param(p: str) -> bool:
-    return p is not None and p != ""
-
-
-def _conn(pwd: str, org: str, errs: List[str]) -> bool:
+def _validate_conn(e: List[str]) -> bool:
+    org = s.secrets.get("GITHUB_ORGANIZATION")
     try:
         c = get_entity(get_github_instance())
         return c.get_user().login != "" and c.get_organization(org).login != ""
     except Exception as e:
-        logger.exception("exception in conn")
-        errs.append(f"faild to connect to github: {str(e)}")
+        e.append(f"faild to connect to github: {str(e)}")
         return False
+
+
+def _validate_params(e: List[str]) -> bool:
+    valid = True
+
+    if s.secrets.get("GITHUB_TOKEN") == "":
+        valid = False
+        e.append("GITHUB_TOKEN is not set")
+
+    if s.secrets.get("GITHUB_ORGANIZATION") == "":
+        valid = False
+        e.append("GITHUB_ORGANIZATION is not set")
+
+    return valid
