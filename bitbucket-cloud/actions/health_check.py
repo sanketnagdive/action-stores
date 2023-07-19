@@ -1,5 +1,7 @@
 from typing import List
+
 from pydantic import BaseModel
+
 from . import action_store as s
 from .bitbucket_actions import get_client
 
@@ -23,7 +25,7 @@ def health_check(_: HealthRequest) -> HealthResponse:
 
 
 def _validate_conn(e: List[str]) -> bool:
-    space = s.secrets["BITBUCKET_SPACE"]
+    space = s.secrets.get("BITBUCKET_SPACE")
     try:
         c = get_client(space)
         return c.get_user().login != ""

@@ -1,6 +1,7 @@
 from typing import List
-from .. import action_store
+
 from pydantic import BaseModel
+
 from .. import action_store as s
 from ..github_wrapper import get_github_instance, get_entity
 

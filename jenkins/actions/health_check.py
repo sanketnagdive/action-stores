@@ -1,8 +1,8 @@
-import logging as log
 from typing import List
+
 from pydantic import BaseModel
+
 from . import action_store as s
-from .secrets import get_secrets
 from .plugins import list_jenkins_plugins
 
 

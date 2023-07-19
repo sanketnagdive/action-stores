@@ -1,7 +1,8 @@
 from typing import List
+
 from pydantic import BaseModel
+
 from .. import action_store as s
-from ..secrets import get_jira_secrets
 from ..jira_wrapper import get_jira_instance
 
 
