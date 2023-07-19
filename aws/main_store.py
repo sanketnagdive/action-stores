@@ -1,9 +1,4 @@
-import kubiya
 
-# ActionStore is a singleton that stores all the actions in the application
-
-store = kubiya.ActionStore("aws", "0.1.0")
-store.uses_secrets(["AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY", "AWS_SESSION_TOKEN"])
 import kubiya
 
 # ActionStore is a singleton that stores all the actions in the application
