@@ -49,16 +49,9 @@ def create_workspace(request: CreateWorkspaceRequest) -> CreateWorkspaceResponse
             'RootVolumeEncryptionEnabled': False,
             'WorkspaceProperties': {
                 'RunningMode': 'ALWAYS_ON',
-                'RunningModeAutoStopTimeoutInMinutes': 0,
                 'RootVolumeSizeGib': 80,
-                'UserVolumeSizeGib': 18,
-                'ComputeTypeName': 'VALUE'},
-            'Tags': [
-                {
-                    'Key': 'string',
-                    'Value':'string'
-                }
-            ]
+                'UserVolumeSizeGib': 10,
+                'ComputeTypeName': 'VALUE'}
         }
     ]
 
