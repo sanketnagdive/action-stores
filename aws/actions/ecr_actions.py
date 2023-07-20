@@ -1,4 +1,4 @@
-from models.ecr_models import (
+from ..models.ecr_models import (
     CreateRepositoryRequest,
     CreateRepositoryResponse,
     DeleteRepositoryRequest,
