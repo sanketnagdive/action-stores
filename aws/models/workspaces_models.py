@@ -3,8 +3,11 @@ from typing import List  ,Optional
 
 
 class CreateWorkspaceRequest(BaseModel):
-    account_id: Optional[str]
-    role_name: Optional[str]
+    #Todo - check multiple accounts
+
+    # account_id: Optional[str]
+    # role_name: Optional[str]
+
     directory_id: str
     user_name: str
     bundle_id: str
