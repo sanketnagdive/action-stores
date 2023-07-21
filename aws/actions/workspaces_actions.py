@@ -55,7 +55,7 @@ def create_workspace(request: CreateWorkspaceRequest) -> CreateWorkspaceResponse
         }
     ]
 
-    if request.account_id:
+    if request.account_id is not None and request.role_name is not None:
         workspace = get_session("workspaces", request.account_id, request.role_name)
         response = workspace.create_workspaces(
             Workspaces=workspaces_l

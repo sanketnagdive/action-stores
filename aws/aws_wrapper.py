@@ -55,12 +55,10 @@ def get_session(service_name: str, account_id: str, role_name: str):
     )
 
     # Create a session with the assumed role credentials
-    region = os.getenv("AWS_REGION", "eu-west-1")
     session = boto3.Session(
         aws_access_key_id=assumed_role['Credentials']['AccessKeyId'],
         aws_secret_access_key=assumed_role['Credentials']['SecretAccessKey'],
         aws_session_token=assumed_role['Credentials']['SessionToken'],
-        region_name=region
     )
 
     # Create the client using the session
