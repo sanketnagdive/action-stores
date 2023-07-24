@@ -41,31 +41,29 @@ def get_client(service_name: str):
                         )
 
 
-#Todo - check multiple accounts
+def get_session(service_name: str, account_id: str, role_name: str):
+    """
+    Returns a boto3 session.
+    """
 
-# def get_session(service_name: str, account_id: str, role_name: str):
-#     """
-#     Returns a boto3 session.
-#     """
-#
-#     # Assume role in the target account
-#     sts_client = boto3.client('sts')
-#     role_arn = f'arn:aws:iam::{account_id}:role/{role_name}'
-#     assumed_role = sts_client.assume_role(
-#         RoleArn=role_arn,
-#         RoleSessionName='AssumeRoleSession'
-#     )
-#
-#     # Create a session with the assumed role credentials
-#     region = os.getenv("AWS_REGION", "eu-west-1")
-#     session = boto3.Session(
-#         aws_access_key_id=assumed_role['Credentials']['AccessKeyId'],
-#         aws_secret_access_key=assumed_role['Credentials']['SecretAccessKey'],
-#         aws_session_token=assumed_role['Credentials']['SessionToken'],
-#         region_name=region
-#     )
-#
-#     # Create the client using the session
-#     client = session.client(service_name)
-#
-#     return client
+    # Assume role in the target account
+    sts_client = get_client("sts")
+    role_arn = f'arn:aws:iam::{account_id}:role/{role_name}'
+    assumed_role = sts_client.assume_role(
+        RoleArn=role_arn,
+        RoleSessionName='AssumeRoleSession'
+    )
+
+    # Create a session with the assumed role credentials
+    region = os.getenv("AWS_REGION", "eu-west-1")
+    session = boto3.Session(
+        aws_access_key_id=assumed_role['Credentials']['AccessKeyId'],
+        aws_secret_access_key=assumed_role['Credentials']['SecretAccessKey'],
+        aws_session_token=assumed_role['Credentials']['SessionToken'],
+        region_name=region
+    )
+
+    # Create the client using the session
+    client = session.client(service_name)
+
+    return client

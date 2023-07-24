@@ -8,7 +8,7 @@ from ..models.workspaces_models import (
 )
 
 from ..main_store import store
-from ..aws_wrapper import get_client #,get_session
+from ..aws_wrapper import get_client ,get_session
 
 
 # @store.kubiya_action()
@@ -55,27 +55,19 @@ def create_workspace(request: CreateWorkspaceRequest) -> CreateWorkspaceResponse
         }
     ]
 
-    #Todo - check multiple accounts
+    if request.account_id is not None and request.role_name is not None:
+        workspace = get_session("workspaces", request.account_id, request.role_name)
+        response = workspace.create_workspaces(
+            Workspaces=workspaces_l
+        )
+    else:
+        workspace = get_client("workspaces")
+        response = workspace.create_workspaces(
+            Workspaces=workspaces_l
+        )
 
-    # if request.account_id is not None and request.role_name is not None:
-    #     workspace = get_session("workspaces", request.account_id, request.role_name)
-    #     response = workspace.create_workspaces(
-    #         Workspaces=workspaces_l
-    #     )
-    # else:
-    #     workspace = get_client("workspaces")
-    #     response = workspace.create_workspaces(
-    #         Workspaces=workspaces_l
-    #     )
-
-
-    workspace = get_client("workspaces")
-    response = workspace.create_workspaces(
-        Workspaces=workspaces_l
-)
-
-    workspace_id = "workspace was created"
-    return CreateWorkspaceResponse(created_workspace_id=workspace_id)
+    workspace_details = response['PendingRequests']
+    return CreateWorkspaceResponse(workspace_details=workspace_details)
 
 
 # @store.kubiya_action()
