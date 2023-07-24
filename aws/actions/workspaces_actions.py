@@ -66,8 +66,11 @@ def create_workspace(request: CreateWorkspaceRequest) -> CreateWorkspaceResponse
             Workspaces=workspaces_l
         )
 
-    workspace_details = response['PendingRequests']
-    return CreateWorkspaceResponse(workspace_details=workspace_details)
+    workspaces = response['PendingRequests']
+
+    workspaces_ids_list = [workspace['WorkspaceId'] for workspace in workspaces]
+
+    return CreateWorkspaceResponse(workspaces_ids=workspaces_ids_list)
 
 
 # @store.kubiya_action()

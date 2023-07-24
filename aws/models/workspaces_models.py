@@ -14,4 +14,4 @@ class CreateWorkspaceRequest(BaseModel):
 
 
 class CreateWorkspaceResponse(BaseModel):
-    workspace_details: List[dict]
+    workspaces_ids: List[str]
