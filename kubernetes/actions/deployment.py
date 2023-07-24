@@ -12,6 +12,9 @@ import json
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
+class ListDeploymentsInput(BaseModel):
+    namespace: Optional[str] = "default"
+
 class Deployment(BaseModel):
     deployment_name: Optional[str] = None
     namespace: Optional[str] = "default"
@@ -307,7 +310,7 @@ def set_deployment_replicas(args: DeploymentReplicasInput):
         return {"error": e.reason}
 
 @action_store.kubiya_action()
-def list_deployment(params: Deployment):
+def list_deployment(params: ListDeploymentsInput):
     logger.info("Listing deployments")
     api_client = clients.get_apps_client()
     api_response = api_client.list_namespaced_deployment(params.namespace)
