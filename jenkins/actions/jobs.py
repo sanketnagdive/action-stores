@@ -68,7 +68,7 @@ class BuildConsoleLogsResponse(BaseModel):
 
 class TriggerJobRequest(BaseModel):
     job_name: str
-    parameters: Optional[dict] = None
+    parameters: Optional[str] = None
 
 class TriggerJobResponse(BaseModel):
     success: bool
@@ -84,6 +84,7 @@ class CancelJobResponse(BaseModel):
 
 class JobStatusRequest(BaseModel):
     job_name: str
+    build_number: Optional[str] = None
 
 class JobStatusResponse(BaseModel):
     status: str
@@ -93,11 +94,17 @@ class JobStatusResponse(BaseModel):
 @action_store.kubiya_action()
 def get_job_status(request: JobStatusRequest) -> JobStatusResponse:
     logger.info(f"Getting status for job {request.job_name}")
-    endpoint = f"/job/{request.job_name}/lastBuild/api/json?tree=result"
+    if request.build_number:
+        logger.info(f"Build number provided, getting status for specific build with ID {request.build_number}")
+        endpoint = f"/job/{request.job_name}/{request.build_number}/api/json?tree=result"
+    else:
+        logger.info("Build number not provided, getting status for last build")
+        endpoint = f"/job/{request.job_name}/lastBuild/api/json?tree=result"
     try:
         response = get_wrapper(endpoint)
         status = response["result"]
         message = "Job is in progress."
+        logger.info(f"Job {request.job_name} status: {status}")
         if status in ["SUCCESS", "FAILURE"]:
             logger.info(f"Job {request.job_name} completed with status {status}")
             message = f"Job status: {status}"
@@ -175,27 +182,37 @@ def get_latest_build_number(job_name: str) -> Optional[int]:
 @action_store.kubiya_action()
 def trigger_job(request: TriggerJobRequest) -> TriggerJobResponse:
     logger.info(f"Triggering job {request.job_name}")
-    endpoint = f"/job/{request.job_name}/buildWithParameters" if request.parameters else f"/job/{request.job_name}/build"
+    endpoint = f"/job/{request.job_name}/buildWithParameters{request.parameters}" if request.parameters else f"/job/{request.job_name}/build"
     try:
-        response = post_wrapper_full_response(endpoint, request.parameters)
+        response = post_wrapper_full_response(endpoint)
         if response.status_code != 201:
-            return TriggerJobResponse(success=False, message=f"Unexpected response status code: {response.status_code}", build_number=None)
+            return TriggerJobResponse(success=False, message=f"Unexpected response status code: {response.status_code}",
+                                      build_number=None)
 
         # Get the queue location from the response headers
         queue_location = response.headers.get('Location')
         logger.info(f"Job {request.job_name} triggered successfully.")
         if queue_location is None:
-            return TriggerJobResponse(success=False, message="Queue location not found in response headers.", build_number=None)
-        
+            return TriggerJobResponse(success=False, message="Queue location not found in response headers.",
+                                      build_number=None)
+
         # Try to get build number from the queue
         build_number = get_build_number_from_queue(queue_location, request.job_name)
-        if build_number is None:
+
+        retry_count = 5
+        delay = 10  # delay in seconds
+        while build_number is None and retry_count > 0:
+            logger.info(f"Job {request.job_name} has left the queue - retrying to get latest build number.")
+            time.sleep(delay)  # wait for some time before trying again
             build_number = get_latest_build_number(request.job_name)
+            retry_count -= 1
 
         if build_number is not None:
+            logger.info(f"Job {request.job_name} build number: {build_number}")
             return TriggerJobResponse(success=True, message="Job triggered successfully.", build_number=build_number)
 
-        return TriggerJobResponse(success=False, message="Failed to retrieve build number.", build_number=None)
+        return TriggerJobResponse(success=False, message="Failed to retrieve build number after retries.",
+                                  build_number=None)
     except Exception as e:
         logger.error(f"Error triggering job {request.job_name}: {e}")
         return TriggerJobResponse(success=False, message=str(e), build_number=None)
