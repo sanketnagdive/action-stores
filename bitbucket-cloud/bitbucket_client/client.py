@@ -315,32 +315,6 @@ class Client(BaseClient):
     #             )
     #     return files
 
-
-    # def post_repository_files(
-    #     self,
-    #     repository_slug: str,
-    #     commit_message: str,
-    #     branch: str,
-    #     files: dict,
-    #     params=None,
-    # ):
-    #     """files ex.
-    #     files = {
-    #         "folder123/file1": ("file1", "content"),
-    #         "folder123/file2": ("file2", "content2"),
-    #     }
-    #     """
-    #
-    #     return self._post_files(
-    #         "2.0/repositories/{}/{}/src".format(self.workspace, repository_slug),
-    #         params=params,
-    #         data={
-    #             "message": commit_message,
-    #             "branch": branch,
-    #         },
-    #         files=files,
-    #     )
-    #
     # def create_issue(self, repository_slug, data, params=None):
     #     """Creates a new issue.
     #
