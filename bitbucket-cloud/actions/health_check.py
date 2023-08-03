@@ -2,8 +2,8 @@ from typing import List
 
 from pydantic import BaseModel
 
-from . import action_store as s
-from .bitbucket_actions import get_client
+from .. import action_store as s
+from .. bitbucket_wrapper import get_client
 
 
 class HealthRequest(BaseModel):
