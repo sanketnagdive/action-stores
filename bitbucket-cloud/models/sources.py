@@ -22,3 +22,18 @@ class UploadFileParams(BaseModel):
 
 class UploadFileResponse(BaseModel):
     pass
+
+
+
+class RepositoryStructure(BaseModel):
+    path: str
+    commit_hash: str
+
+class GetRepositoryStructureParams(BaseModel):
+    workspace: str
+    repository_slug: str
+    branch_or_commit: str
+    path: str=""
+
+class GetRepositoryStructureResponse(BaseModel):
+    structure: List[RepositoryStructure]

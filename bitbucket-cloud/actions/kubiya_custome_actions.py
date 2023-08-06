@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from .. import action_store
 from .. bitbucket_wrapper import get_client
 
-from ..models.kubiya_custom import (
+from ..models.kubiya_custome import (
     EditYamlFileParams,EditYamlFileResponse
 )
 

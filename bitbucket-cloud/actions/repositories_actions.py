@@ -21,23 +21,6 @@ def get_repositories(input: GetRepositoriesParams)->GetRepositoriesResponse:
 
     return GetRepositoriesResponse(repos=all_repos)
 
-
-# class GetRepositoryStructureInput(BaseModel):
-#     workspace: str
-#     repository: str
-#     branch_or_commit: str
-#
-#
-# @action_store.kubiya_action()
-# def get_repository_structure(input: GetRepositoryStructureInput):
-#     client = get_client(input.workspace)
-#     all_files = client.get_repository_structure(
-#         input.repository, input.branch_or_commit
-#     )
-#     return all_files
-
-
-
 # class CreatePRInput(BaseModel):
 #     workspace: str
 #     repository: str

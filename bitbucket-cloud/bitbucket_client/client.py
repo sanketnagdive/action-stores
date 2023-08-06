@@ -22,48 +22,6 @@ class Client(BaseClient):
             owner = user_data.get("username")
         self.workspace = owner
 
-    # def all_pages(
-    #     self,
-    #     method: typing.Callable[..., typing.Union[typing.Dict, None]],
-    #     *args,
-    #     **kwargs,
-    # ) -> typing.Generator[typing.Dict[str, typing.Any], None, None]:
-    #     """
-    #     Retrieves all pages in the response from a BitBucket API list endpoint and yields a generator for the items in the
-    #     response.
-    #
-    #     Example:
-    #
-    #     ```python
-    #     for item in client.all_pages(
-    #         client.get_issues,
-    #         "{726f1aab-826f-4c08-a127-1224347b3d09}"
-    #     ):
-    #         print(item["id"])
-    #     ```
-    #
-    #     Args:
-    #         method: A client class method to retrieve all pages from.
-    #         *args: Variable length argument list to be passed to the `method` callable.
-    #         **kwargs: Arbitrary keyword arguments to be passed to the `method` callable.
-    #
-    #     Returns:
-    #         A generator that yields a dictionary of item data for each item in the response.
-    #
-    #     Raises:
-    #         Any exceptions raised by the `method` callable.
-    #     """
-    #     resp = method(*args, **kwargs)
-    #     while True:
-    #         if resp is None:
-    #             break
-    #
-    #         yield from resp["values"]
-    #
-    #         if "next" not in resp:
-    #             break
-    #         resp = self._get(resp["next"])
-
     # def get_user(self, params=None):
     #     """Returns the currently logged in user.
     #
@@ -206,26 +164,7 @@ class Client(BaseClient):
     #         "2.0/repositories/{}/{}/versions".format(self.workspace, repository_slug),
     #         params=params,
     #     )
-    #
-    # def get_repository_source_code(
-    #     self, repository_slug, branch_or_commit, params=None
-    # ):
-    #     """Returns data about the source code of given repository.
-    #
-    #     Args:
-    #         repository_slug:
-    #         params:
-    #
-    #     Returns:
-    #
-    #     """
-    #     return self._get(
-    #         "2.0/repositories/{}/{}/src/{}/".format(
-    #             self.workspace, repository_slug, branch_or_commit
-    #         ),
-    #         params=params,
-    #     )
-    #
+
     # def get_repository_folder_source_code(
     #     self, repository_slug, branch_or_commit, path="", params=None
     # ):
@@ -235,18 +174,7 @@ class Client(BaseClient):
     #         ),
     #         params=params,
     #     )
-    #
-    # def get_repository_structure(self, repository_slug, branch_or_commit, params=None):
-    #     objs = list(
-    #         self.all_pages(
-    #             self.get_repository_source_code,
-    #             repository_slug,
-    #             branch_or_commit,
-    #             params=params,
-    #         )
-    #     )
-    #     return self._get_objs(repository_slug, objs, params=params)
-    #
+
     # def get_open_pull_requests(self, repository_slug, params=None):
     #     """Returns a paginated list of open pull requests from the specified repository.
     #
@@ -289,31 +217,7 @@ class Client(BaseClient):
     #         params=params,
     #     )
     #
-    # def _get_objs(
-    #     self,
-    #     repository_slug: str,
-    #     objs: typing.List[typing.Dict[str, typing.Any]],
-    #     params=None,
-    # ) -> typing.List[dict[str, typing.Any]]:
-    #     files = []
-    #     for obj in objs:
-    #         if obj.get("type") == "commit_directory":
-    #             link = obj.get("links", {}).get("self", {}).get("href")
-    #             print(f"link: {link}")
-    #             if link is None:
-    #                 continue
-    #             folder_objs = list(self.all_pages(self._get, link, params=params))
-    #             files = files + self._get_objs(
-    #                 repository_slug, folder_objs, params=params
-    #             )
-    #         elif obj.get("type") == "commit_file":
-    #             files.append(
-    #                 {
-    #                     "path": obj["path"],
-    #                     "commit_hash": obj["commit"]["hash"],
-    #                 }
-    #             )
-    #     return files
+
 
     # def create_issue(self, repository_slug, data, params=None):
     #     """Creates a new issue.
@@ -472,14 +376,31 @@ class Client(BaseClient):
     #         params=params,
     #     )
 
-    # def _get(self, endpoint: str, params=None):
-    #     print(f"GET {endpoint}")
-    #     response = requests.get(
-    #         endpoint if endpoint.startswith("http") else self.BASE_URL + endpoint,
-    #         params=params,
-    #         auth=(self.user, self.password),
-    #     )
-    #     return self.parse(response)
+    def _get_objs(
+                self,
+                repository_slug: str,
+                objs: typing.List[typing.Dict[str, typing.Any]],
+                params=None,
+        ) -> typing.List[dict[str, typing.Any]]:
+        files = []
+        for obj in objs:
+            if obj.get("type") == "commit_directory":
+                link = obj.get("links", {}).get("self", {}).get("href")
+                print(f"link: {link}")
+                if link is None:
+                    continue
+                folder_objs = self._get(link, params=params)
+                files = files + self._get_objs(
+                    repository_slug, list(folder_objs), params=params
+                )
+            elif obj.get("type") == "commit_file":
+                files.append(
+                    {
+                        "path": obj["path"],
+                        "commit_hash": obj["commit"]["hash"],
+                    }
+                )
+        return files
 
     def _get(self, endpoint: str, params=None):
         print(f"GET {endpoint}")

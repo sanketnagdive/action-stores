@@ -8,7 +8,8 @@ from .. bitbucket_wrapper import get_client
 
 from ..models.sources import (
     GetFileContentParams, GetFileContentResponse,
-    UploadFileParams, UploadFileResponse
+    UploadFileParams, UploadFileResponse,
+    GetRepositoryStructureParams, GetRepositoryStructureResponse,
 )
 
 
@@ -40,8 +41,21 @@ def upload_file(input: UploadFileParams)->UploadFileResponse:
                             data={"message": input.commit_message,"branch": input.branch,},
                             files={input.file_path: input.file_content},
     )
+
     return res
 
+
+@action_store.kubiya_action()
+def get_repository_structure(input: GetRepositoryStructureParams)->GetRepositoryStructureResponse:
+    client = get_client(input.workspace)
+    resp=client._get("2.0/repositories/{}/{}/src/{}/".format(input.workspace,
+                                                             input.repository_slug,
+                                                             input.branch_or_commit,
+                                                             input.path),params=None)
+
+    structure=client._get_objs(input.repository_slug, resp, params=None)
+
+    return GetRepositoryStructureResponse(structure=structure)
 
 # class File(BaseModel):
 #     path: str
