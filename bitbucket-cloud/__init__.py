@@ -9,5 +9,6 @@ action_store.uses_secrets(
     [
         "BITBUCKET_USERNAME",
         "BITBUCKET_APP_PASSWORD",
+        "BITBUCKET_SPACE" #For health check purpose only
     ]
 )

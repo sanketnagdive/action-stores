@@ -1,4 +1,4 @@
-from typing import List
+from typing import List , Union
 
 from pydantic import BaseModel
 
@@ -12,8 +12,8 @@ class HealthRequest(BaseModel):
 
 class HealthResponse(BaseModel):
     params: bool
-    connection: bool
-    errors: List[str]
+    connection: Union[bool, dict]
+    errors: List[str] =[]
 
 
 @s.kubiya_action()
@@ -27,8 +27,8 @@ def health_check(_: HealthRequest) -> HealthResponse:
 def _validate_conn(e: List[str]) -> bool:
     space = s.secrets.get("BITBUCKET_SPACE")
     try:
-        c = get_client(space)
-        return c.get_user().login != ""
+        c = get_client(workspace=space)
+        return c.get_user() != ""
     except Exception as e:
         e.append(f"faild to connect to bitbucket: {str(e)}")
         return False
