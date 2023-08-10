@@ -13,9 +13,10 @@ class ProjectsIdDoraMetrics(BaseModel):
     id: int
     metric: str
     end_date: Optional[str] = None
-    environment_tiers: Optional[List[str]] = None
+    environment_tiers: Optional[List[str]] = Field(default = '[]' )
     interval: Optional[str] = None
     start_date: Optional[str] = None
+
 class GroupsIdDoraMetrics(BaseModel):
     id: int
     metric: str

@@ -10,7 +10,6 @@ class Projects(BaseModel):
 class SingleProject(BaseModel):
     projects: dict
 
-
 class Users(BaseModel):
     users: List[dict]
 

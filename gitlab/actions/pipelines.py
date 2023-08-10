@@ -6,7 +6,6 @@ from ..models.pipelines import *
 from .. import action_store as action_store
 from ..http_wrapper import *
 
-
 @action_store.kubiya_action()
 def list_project_pipelines(input: ListProjectPipelinesInput):
     response =  get_wrapper(endpoint=f'/projects/{input.id}/pipelines', args=input.dict(exclude_none=True))

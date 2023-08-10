@@ -15,7 +15,6 @@ def list_repository_tree(input: ProjectsIdRepositoryTree):
 def get_a_blob_from_repository(input: ProjectsIdRepositoryBlobsSha):
     return get_wrapper(endpoint=f'/projects/{input.id}/repository/blobs/{input.sha}', args=input.dict(exclude_none=True))
 
-
 @action_store.kubiya_action()
 def raw_blob_content(input: ProjectsIdRepositoryBlobsShaRaw):
     return get_wrapper(endpoint=f'/projects/{input.id}/repository/blobs/{input.sha}/raw', args=input.dict(exclude_none=True))

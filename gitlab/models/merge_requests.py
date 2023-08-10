@@ -2,6 +2,11 @@ from typing import List, Any, Optional, Union, Dict, Union
 from pydantic import BaseModel, Field
 from datetime import datetime
 
+class ListDict(BaseModel):
+    response: List[dict]
+
+class SingleDict(BaseModel):
+    response: dict
 
 class ListMergeRequests(BaseModel):
     id: Union[int, str] = Field(..., description='The ID or URL-encoded path of the project owned by the authenticated user.')

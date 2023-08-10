@@ -75,9 +75,6 @@ def promote_issue_to_epic(input: PromoteIssueToEpicInput):
     response =  post_wrapper(endpoint=f'/projects/{input.id}/issues/{input.issue_iid}/notes', data=input.dict())
     return Issues(issues=response)
 
-# @action_store.kubiya_action()
-# def upload_metric_image(input: UploadMetricImage):
-#     response =  post_wrapper(endpoint=f'/projects/{input.id}/issues/{input.issue_iid}/metric_images', args=input.dict(exclude_none=True))
 @action_store.kubiya_action()
 def set_time_estimate_for_an_issue(input: TimeEstimateForAnIssue):
     response =  post_wrapper(endpoint=f'/projects/{input.id}/issues/{input.issue_iid}/time_estimate', args=input.dict(exclude_none=True))
@@ -117,21 +114,3 @@ def list_merge_requests_that_close_issue(input: IssueIdentifier):
 def get_issue_participants(input: IssueIdentifier):
     response =  get_wrapper(endpoint=f'/projects/{input.id}/issues/{input.issue_iid}/participants')
     return Issues(issues=response)
-
-# @action_store.kubiya_action()
-# def get_user_agent_details(input: IssueIdentifier):
-#     response =  get_wrapper(endpoint=f'/projects/{input.id}/issues/{input.issue_iid}/user_agent_detail')
-#     return Issues(issues=response)
-
-# @action_store.kubiya_action()
-# def upload_metric_image(input: UploadMetricImage):
-#     response =  post_wrapper(endpoint=f'/projects/{input.id}/issues/{input.issue_iid}/metric_images', args=input.dict(exclude_none=True))
-# @action_store.kubiya_action()
-# def list_metric_images(input: ListMetricImages):
-#     response =  get_wrapper(endpoint=f'/projects/{input.id}/issues/{input.issue_iid}/metric_images')
-# @action_store.kubiya_action()
-# def update_metric_image(input: UpdateMetricImage):
-#     response =  put_wrapper(endpoint=f'/projects/{input.id}/issues/{input.issue_iid}/metric_images/{input.image_id}', args=input.dict(exclude_none=True))
-# @action_store.kubiya_action()
-# def delete_metric_image(input: DeleteMetricImage):
-#     response =  delete_wrapper(endpoint=f'/projects/{input.id}/issues/{input.issue_iid}/metric_images/{input.image_id}')

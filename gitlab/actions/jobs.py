@@ -26,10 +26,12 @@ def list_pipeline_trigger_jobs(input: ListPipelineTriggerJobsInput):
 def get_allowed_agents(input: GetAllowedAgentsInput):
     response = get_wrapper(endpoint='/job/allowed_agents', args=input.dict())
     return SingleDict(response = response)
+
 @action_store.kubiya_action()
 def get_a_single_job(input: GetSingleJobInput):
     response = get_wrapper(endpoint=f'/projects/{input.id}/jobs/{input.job_id}')
     return SingleDict(response = response)
+
 @action_store.kubiya_action()
 def get_a_job_log(input: JobInput):
     response = get_wrapper(endpoint=f'/projects/{input.id}/jobs/{input.job_id}/trace')

@@ -6,8 +6,6 @@ from ..models.repository_files import *
 from .. import action_store as action_store
 from ..http_wrapper import *
 
-
-
 @action_store.kubiya_action()
 def get_file_from_repository(input: ProjectIdRepositoryFiles):
     response = get_wrapper(endpoint=f'/projects/{input.id}/repository/files/{input.file_path}', args=input.dict(exclude_none=True))
