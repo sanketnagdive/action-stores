@@ -45,7 +45,8 @@ class BaseClient(object):
         if status_code in (200, 201, 202):
             return r
         if status_code == 204:
-            return None
+            # return None
+            return r
         message = None
         try:
             if type(r) == dict:

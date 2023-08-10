@@ -1,6 +1,23 @@
 from pydantic import BaseModel
 from typing import List
 
+
+class GetRepositoryParams(BaseModel):
+    workspace: str
+    repo_slug: str
+
+class GetRepositoryResponse(BaseModel):
+    repo: dict
+
+
+class CreateRepositoryParams(BaseModel):
+    workspace: str
+    repo_slug: str
+    is_private: bool
+
+class CreateRepositoryResponse(BaseModel):
+    response: dict
+
 class GetRepositoriesParams(BaseModel):
     workspace: str
 

@@ -1,4 +1,4 @@
-from typing import List , Union
+from typing import List
 
 from pydantic import BaseModel
 
@@ -12,13 +12,14 @@ class HealthRequest(BaseModel):
 
 class HealthResponse(BaseModel):
     params: bool
-    connection: Union[bool, dict]
-    errors: List[str] =[]
+    connection: bool
+    errors: List[str]
 
 
 @s.kubiya_action()
 def health_check(_: HealthRequest) -> HealthResponse:
-    errors = List[str]
+    errors = []
+
     params = _validate_params(errors)
     connection = _validate_conn(errors)
     return HealthResponse(params=params, connection=connection, errors=errors)
@@ -27,8 +28,8 @@ def health_check(_: HealthRequest) -> HealthResponse:
 def _validate_conn(e: List[str]) -> bool:
     space = s.secrets.get("BITBUCKET_SPACE")
     try:
-        c = get_client(workspace=space)
-        return c.get_user() != ""
+        c = get_client(space)
+        return c.get_user().get("username") != ""
     except Exception as e:
         e.append(f"faild to connect to bitbucket: {str(e)}")
         return False
