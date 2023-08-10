@@ -9,7 +9,19 @@ from kubiya import ActionStore, get_secret
 
 from kubernetes import client, config
 
+EXCLUDED_NAMESPACES = ["kube-node-lease",
+                       "kubiya",
+                       "local-path-storage",
+                       "kube-system",
+                       "kube-public",
+                       "kube-node-lease",
+                       "openfaas",
+                       "openfaas-fn","ram12345"]
+
+EXCLUDED_NAMESPACES_WITH_DEFAULT = ["default"] + EXCLUDED_NAMESPACES
+
 actionstore = ActionStore("kubernetes", "0.1.0")
+
 
 # actionstore.uses_secrets(["GKE_SERVICE_ACCOUNT", "GKE_PROJECT", "GKE_CLUSTER_REGION", "GKE_CLUSTER_NAME",])
 

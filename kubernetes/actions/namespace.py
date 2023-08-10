@@ -1,7 +1,7 @@
 import logging
-from typing import List
+from typing import List,Literal
 
-from . import actionstore as action_store
+from . import actionstore as action_store , EXCLUDED_NAMESPACES , EXCLUDED_NAMESPACES_WITH_DEFAULT
 from .clients import get_batch_client, get_core_api_client
 from kubernetes.client import V1Namespace
 
@@ -40,8 +40,12 @@ def create_namespace(namespace: NamespaceMeta):
 @action_store.kubiya_action()
 def delete_namespace(namespace: NamespaceMeta):
     api_client = get_core_api_client()
-    api_response = api_client.delete_namespace(name=namespace.namespace)
-    return {"status": "deleted", "namespace": namespace.namespace}
+
+    if namespace.namespace in EXCLUDED_NAMESPACES_WITH_DEFAULT:
+        return {"status": "skipped", "namespace": namespace.namespace,"message":"delete of this namespace is not allowed"}
+    else:
+        api_response = api_client.delete_namespace(name=namespace.namespace)
+        return {"status": "deleted", "namespace": namespace.namespace}
 
 @action_store.kubiya_action()
 def get_namespace(namespace: NamespaceMeta):
@@ -49,7 +53,8 @@ def get_namespace(namespace: NamespaceMeta):
     api_response = api_client.read_namespace(name=namespace.namespace)
     return api_response.to_dict()
 
-@action_store.kubiya_action()
+#Excclude scale_env_to_zero this action from the list of actions
+# @action_store.kubiya_action()
 def scale_env_to_zero(args):
     logger.info("scale_env_to_zero has started")
     list_deployment_input = Deployment(namespace=args.get("namespace"))
