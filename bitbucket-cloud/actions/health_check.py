@@ -2,8 +2,8 @@ from typing import List
 
 from pydantic import BaseModel
 
-from . import action_store as s
-from .bitbucket_actions import get_client
+from .. import action_store as s
+from .. bitbucket_wrapper import get_client
 
 
 class HealthRequest(BaseModel):
@@ -18,7 +18,8 @@ class HealthResponse(BaseModel):
 
 @s.kubiya_action()
 def health_check(_: HealthRequest) -> HealthResponse:
-    errors = List[str]
+    errors = []
+
     params = _validate_params(errors)
     connection = _validate_conn(errors)
     return HealthResponse(params=params, connection=connection, errors=errors)
@@ -28,7 +29,7 @@ def _validate_conn(e: List[str]) -> bool:
     space = s.secrets.get("BITBUCKET_SPACE")
     try:
         c = get_client(space)
-        return c.get_user().login != ""
+        return c.get_user().get("username") != ""
     except Exception as e:
         e.append(f"faild to connect to bitbucket: {str(e)}")
         return False
