@@ -5,6 +5,8 @@ from kubernetes import client
 from . import actionstore as action_store
 from .clients import get_core_api_client
 
+class Namespace(BaseModel):
+    namespace_name: str
 
 class Service(BaseModel):
     name: str
@@ -14,11 +16,14 @@ class Service(BaseModel):
     external_ip: Optional[str]
     ports: Optional[List[str]]
 
+class GetService(BaseModel):
+    namespace: str
+    service_name: str
 
 @action_store.kubiya_action()
-def list_services(namespace: str) -> List[Service]:
+def list_services(input: Namespace) -> List[Service]:
     api_client = get_core_api_client()
-    api_response = api_client.list_namespaced_service(namespace)
+    api_response = api_client.list_namespaced_service(input.namespace_name)
     services = []
     for item in api_response.items:
         service = Service(
@@ -34,9 +39,9 @@ def list_services(namespace: str) -> List[Service]:
 
 
 @action_store.kubiya_action()
-def get_service(namespace: str, service_name: str) -> Service:
+def get_service(service: GetService) -> Service:
     api_client = get_core_api_client()
-    api_response = api_client.read_namespaced_service(service_name, namespace)
+    api_response = api_client.read_namespaced_service(service.service_name, service.namespace)
     service = Service(
         name=api_response.metadata.name,
         namespace=api_response.metadata.namespace,
