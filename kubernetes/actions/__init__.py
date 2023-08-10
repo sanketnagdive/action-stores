@@ -16,7 +16,7 @@ EXCLUDED_NAMESPACES = ["kube-node-lease",
                        "kube-public",
                        "kube-node-lease",
                        "openfaas",
-                       "openfaas-fn","ram12345"]
+                       "openfaas-fn"]
 
 EXCLUDED_NAMESPACES_WITH_DEFAULT = ["default"] + EXCLUDED_NAMESPACES
 
