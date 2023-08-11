@@ -6,6 +6,11 @@ from . import actionstore as action_store , EXCLUDED_NAMESPACES
 from .clients import get_core_api_client
 
 
+class NamespacePodPatchModel(BaseModel):
+    namespace: str
+    pod_name: str
+    body: dict
+
 class NamespacePodModel(BaseModel):
     namespace: str
     pod_name: str
@@ -122,16 +127,16 @@ def create_namespaced_pod(data: NamespaceModel) -> dict:
 
 
 @action_store.kubiya_action()
-def patch_namespaced_pod(data: NamespaceModel) -> dict:
+def patch_namespaced_pod(data: NamespacePodPatchModel) -> dict:
     if data.namespace in EXCLUDED_NAMESPACES:
         return {"error": "patch of this namespace is not allowed"}
     try:
         api_client = get_core_api_client()
 
         resp = api_client.patch_namespaced_pod(
-            name=data.namespace, 
+            name=data.pod_name,
             namespace=data.namespace, 
-            body={}
+            body=data.body
         )
 
         return resp.to_dict()
