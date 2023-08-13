@@ -9,7 +9,7 @@ class ListRepoArtifactsParams(BaseModel):
     name: Optional[str]
 
 class ListRepoArtifactsResponse(BaseModel):
-    resp: List
+    resp: dict
 
 class GetArtifactParams(BaseModel):
     owner: str
@@ -98,7 +98,7 @@ class GetCustomizationTemplateForOIDCSubjectClaimOrgResponse(BaseModel):
 
 class SetCustomizationTemplateForOIDCSubjectClaimOrgParams(BaseModel):
     org: str
-    include_claim_keys: List[str]
+    include_claim_keys: List
 
 
 class GetCustomizationTemplateForOIDCSubjectClaimRepoParams(BaseModel):
@@ -128,6 +128,9 @@ class SetOrgsActionsPermissionsParams(BaseModel):
 class ListSelectedReposEnabledForActionsByOrgParams(BaseModel):
     org: str
 
+class ListSelectedReposEnabledForActionsByOrgResponse(BaseModel):
+    resp: object
+
 class SetReposEnabledForActionsByOrgParams(BaseModel):
     org: str
     selected_repository_ids: List[int]
@@ -143,11 +146,16 @@ class DisableRepoInOrgForActionsParams(BaseModel):
 class GetAllowedActionsByOrgParams(BaseModel):
     org: str
 
+class GetAllowedActionsByOrgResponse(BaseModel):
+    resp: dict
+
+
+
 class SetAllowedActionsByOrgParams(BaseModel):
     org: str
     github_owned_allowed: Optional[bool]
     verified_allowed: Optional[bool]
-    patterns_allowed: Optional[List[str]]
+    patterns_allowed: Optional[List]
 
 class GetOrgDefaultWorkflowPermissionsParams(BaseModel):
     org: str
@@ -200,12 +208,21 @@ class SetRepoDefaultWorkflowPermissionsParams(BaseModel):
 class ListOrgSecretsParams(BaseModel):
     org: str
 
+class ListOrgSecretsResponse(BaseModel):
+    resp: dict
+
 class GetOrgPublicKeyParams(BaseModel):
     org: str
+
+class GetOrgPublicKeyResponse(BaseModel):
+    resp: dict
 
 class GetOrgSecretParams(BaseModel):
     org: str
     secret_name: str
+
+class GetOrgSecretResponse(BaseModel):
+    resp: dict
 
 class CreateUpdateOrgSecretParams(BaseModel):
     org: str
@@ -246,14 +263,23 @@ class ListRepoSecretsParams(BaseModel):
     owner: str
     repo: str
 
+class ListRepoSecretsResponse(BaseModel):
+    resp: dict
+
 class GetRepoPublicKeyParams(BaseModel):
     owner: str
     repo: str
+
+class GetRepoPublicKeyResponse(BaseModel):
+    resp: dict
 
 class GetRepoSecretParams(BaseModel):
     owner: str
     repo: str
     secret_name: str
+
+class GetRepoSecretResponse(BaseModel):
+    resp: dict
 
 class CreateUpdateRepoSecretParams(BaseModel):
     owner: str
