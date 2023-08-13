@@ -11,6 +11,9 @@ class NamespacePodPatchModel(BaseModel):
     pod_name: str
     body: dict
 
+class NamespacePodCreateModel(BaseModel):
+    namespace: str
+    body: dict
 class NamespacePodModel(BaseModel):
     namespace: str
     pod_name: str
@@ -31,7 +34,11 @@ class DeletePodModel(BaseModel):
 
 class LabelModel(BaseModel):
     namespace: str
-    label: str
+    label_key: str
+    label_value: str
+
+class PodLogsModel(BaseModel):
+    logs: List[str]
 
 # Remove this from playgroud
 # @action_store.kubiya_action()
@@ -83,13 +90,14 @@ def list_namespaced_pod(data: NamespaceModel) -> List[dict]:
 
 
 @action_store.kubiya_action()
-def get_pod_logs_by_label(data: LabelModel) -> List[str]:
+def get_pod_logs_by_label(data: LabelModel) -> PodLogsModel:
     if data.namespace=="kubiya":
         return {"error": "get logs of this namespace is not allowed"}
     try:
         api_client = get_core_api_client()
 
-        label_selector = "controller-uid={}".format(data.label)
+        # label_selector = "controller-uid={}".format(data.label)
+        label_selector = "{}={}".format(data.label_key,data.label_value)
         resp = api_client.list_namespaced_pod(
             namespace=data.namespace, 
             label_selector=label_selector
@@ -97,7 +105,8 @@ def get_pod_logs_by_label(data: LabelModel) -> List[str]:
 
         if resp.items:
             pod_name = resp.items[0].metadata.name
-            return api_client.read_namespaced_pod_log(pod_name, data.namespace).split("\n")
+            pod_logs= api_client.read_namespaced_pod_log(pod_name, data.namespace).split("\n")
+            return PodLogsModel(logs=pod_logs)
         else:
             return ["No pods found"]
     except client.rest.ApiException as e:
@@ -105,20 +114,34 @@ def get_pod_logs_by_label(data: LabelModel) -> List[str]:
 
 
 @action_store.kubiya_action()
-def create_namespaced_pod(data: NamespaceModel) -> dict:
+def create_namespaced_pod(data: NamespacePodCreateModel) -> dict:
     if data.namespace in EXCLUDED_NAMESPACES:
         return {"error": "create of this namespace is not allowed"}
     try:
         api_client = get_core_api_client()
 
-        pod = client.V1Pod(
-            api_version="v1",
-            kind="Pod",
-            metadata=client.V1ObjectMeta(name=data.namespace),
-        )
+        # # Define the pod's container spec
+        # container_spec = {
+        #     "name": "my-container",
+        #     "image": "nginx:latest",  # Use any desired image
+        #     "ports": [{"containerPort": 80}]  # Example port configuration
+        # }
+        #
+        # # Define the complete pod specification
+        # pod = {
+        #     "apiVersion": "v1",
+        #     "kind": "Pod",
+        #     "metadata": {
+        #         "name": "example-pod"
+        #     },
+        #     "spec": {
+        #         "containers": [container_spec]
+        #     }
+        # }
+
 
         resp = api_client.create_namespaced_pod(
-            namespace=data.namespace, body=pod
+            namespace=data.namespace, body=data.body
         )
 
         return resp.to_dict()
