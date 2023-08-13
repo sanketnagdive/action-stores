@@ -1,8 +1,8 @@
 from pydantic import BaseModel
 from typing import List
-
+from . import DEFAULT_BB_WORKSPACE
 class GetOpenPullRequestsParams(BaseModel):
-    workspace: str
+    workspace: str= DEFAULT_BB_WORKSPACE
     repository_slug: str
 
 class GetOpenPullRequestsResponse(BaseModel):
@@ -10,7 +10,7 @@ class GetOpenPullRequestsResponse(BaseModel):
 
 
 class MergePrParams(BaseModel):
-    workspace: str
+    workspace: str= DEFAULT_BB_WORKSPACE
     repository_slug: str
     pull_request_id: str
 
@@ -19,7 +19,7 @@ class MergePrResponse(BaseModel):
 
 
 class CreatePrParams(BaseModel):
-    workspace: str
+    workspace: str= DEFAULT_BB_WORKSPACE
     repository_slug: str
     title: str
     source_branch: str

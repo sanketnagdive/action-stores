@@ -3,7 +3,7 @@ import logging
 import os
 import time
 from datetime import timedelta
-from typing import Dict, Optional
+from typing import Dict, Optional,Literal
 
 from pydantic import BaseModel
 
@@ -18,10 +18,13 @@ from kubernetes.client import (
 )
 from kubernetes.client.rest import ApiException
 
-from . import actionstore as action_store
+from . import actionstore as action_store ,EXCLUDED_NAMESPACES
 from .clients import get_batch_client, get_core_api_client
 
 logging.basicConfig(level=logging.INFO)
+
+# For playground - limit to default namespace
+NamespaceType=Literal["default"]
 
 
 class Job(BaseModel):
@@ -32,7 +35,7 @@ class Job(BaseModel):
     kubernetes_client_retry_attempts: int = 44
     kubernetes_client_timeout: int = 55
     job_name: str = "example-job"
-    namespace: str = "default"
+    namespace: NamespaceType = "default"
     image: str = "nginx:latest"
     container_name: str = "example-container"
     env_vars: Optional[Dict[str, str]] = None
@@ -83,6 +86,8 @@ def get_job_events(job: JobMeta):
 
 @action_store.kubiya_action()
 def suspend_job(job: JobMeta):
+    if job.namespace in EXCLUDED_NAMESPACES:
+        return {"error": f"Namespace {job.namespace} is excluded from this action"}
     api_client = get_batch_client()
     api_response = api_client.read_namespaced_job(job.name, job.namespace)
     api_response.spec.suspend = True
@@ -91,6 +96,8 @@ def suspend_job(job: JobMeta):
 
 @action_store.kubiya_action()
 def resume_job(job: JobMeta):
+    if job.namespace in EXCLUDED_NAMESPACES:
+        return {"error": f"Namespace {job.namespace} is excluded from this action"}
     api_client = get_batch_client()
     api_response = api_client.read_namespaced_job(job.name, job.namespace)
     api_response.spec.suspend = False
@@ -98,7 +105,7 @@ def resume_job(job: JobMeta):
     return api_response
 
 
-@action_store.kubiya_action()
+# @action_store.kubiya_action()
 def wait_for_job_completion(job: JobCompletionMeta):
     api_client = get_batch_client()
     start_time = time.time()
@@ -173,12 +180,15 @@ def create_namespaced_job(job: Job):
 
 @action_store.kubiya_action()
 def delete_namespaced_job(job: JobMeta):
+    if job.namespace in EXCLUDED_NAMESPACES:
+        return {"error": f"Namespace {job.namespace} is excluded from this action"}
     api_client = get_batch_client()
     try:
         api_response = api_client.delete_namespaced_job(
-            job.job_name, job.namespace, propagation_policy="Background"
+            job.name, job.namespace, propagation_policy="Background"
         )
         logging.info(f"Job deleted. response='{str(api_response)}")
+        return api_response
     except ApiException as e:
         # create a meaningful error message
         raise ApiException(

@@ -1,9 +1,9 @@
 from pydantic import BaseModel
 from typing import List
-
+from . import DEFAULT_BB_WORKSPACE
 
 class GetRepositoryParams(BaseModel):
-    workspace: str
+    workspace: str= DEFAULT_BB_WORKSPACE
     repo_slug: str
 
 class GetRepositoryResponse(BaseModel):
@@ -11,7 +11,7 @@ class GetRepositoryResponse(BaseModel):
 
 
 class CreateRepositoryParams(BaseModel):
-    workspace: str
+    workspace: str = DEFAULT_BB_WORKSPACE
     repo_slug: str
     is_private: bool
 
@@ -19,7 +19,7 @@ class CreateRepositoryResponse(BaseModel):
     response: dict
 
 class GetRepositoriesParams(BaseModel):
-    workspace: str
+    workspace: str = DEFAULT_BB_WORKSPACE
 
 
 class Repository(BaseModel):

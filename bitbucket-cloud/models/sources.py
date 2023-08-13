@@ -1,9 +1,9 @@
 from pydantic import BaseModel
 from typing import List
-
+from . import DEFAULT_BB_WORKSPACE
 
 class GetFileContentParams(BaseModel):
-    workspace: str
+    workspace: str = DEFAULT_BB_WORKSPACE
     repository: str
     file_path: str
     commit_id: str
@@ -13,7 +13,7 @@ class GetFileContentResponse(BaseModel):
 
 
 class UploadFileParams(BaseModel):
-    workspace: str
+    workspace: str=DEFAULT_BB_WORKSPACE
     repository_slug: str
     branch: str
     commit_message: str
@@ -30,7 +30,7 @@ class RepositoryStructure(BaseModel):
     commit_hash: str
 
 class GetRepositoryStructureParams(BaseModel):
-    workspace: str
+    workspace: str= DEFAULT_BB_WORKSPACE
     repository_slug: str
     branch_or_commit: str
     path: str=""

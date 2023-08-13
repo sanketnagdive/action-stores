@@ -1,9 +1,9 @@
 from pydantic import BaseModel
 from typing import List
-
+from . import DEFAULT_BB_WORKSPACE
 
 class GetIssueParams(BaseModel):
-    workspace: str
+    workspace: str=DEFAULT_BB_WORKSPACE
     repository_slug: str
     issue_id: str
 
@@ -12,14 +12,14 @@ class GetIssueResponse(BaseModel):
 
 
 class GetIssuesParams(BaseModel):
-    workspace: str
+    workspace: str=DEFAULT_BB_WORKSPACE
     repository_slug: str
 
 class GetIssuesResponse(BaseModel):
     issues: List[dict]
 
 class CreateIssueParams(BaseModel):
-    workspace: str
+    workspace: str=DEFAULT_BB_WORKSPACE
     repo_slug: str
     type: str
     title: str
@@ -30,7 +30,7 @@ class CreateIssueResponse(BaseModel):
     issue: dict
 
 class DeleteIssueParams(BaseModel):
-    workspace: str
+    workspace: str=DEFAULT_BB_WORKSPACE
     repo_slug: str
     issue_id: str
 

@@ -55,7 +55,7 @@ def list_enabled_cronjobs_for_namespace(args):
         item.metadata.name for item in api_response.items if item.spec.schedule != ""
     ]
 
-@action_store.kubiya_action()
+# @action_store.kubiya_action()
 def delete_stuck_cronjob(args):
     api_client = get_batch_client()
     api_response = api_client.list_cron_job_for_all_namespaces()
@@ -71,7 +71,7 @@ class CronjobDisableInput(BaseModel):
     namespace: Optional[str] = "default"
     cron_name: Optional[str] = None
 
-@action_store.kubiya_action()
+# @action_store.kubiya_action()
 def disable_cronjob(args: CronjobDisableInput):
     try:
         cron_job_name = args.cron_name
@@ -82,7 +82,7 @@ def disable_cronjob(args: CronjobDisableInput):
     except api_client.rest.ApiException as e:
         return {"error": e.reason}
 
-@action_store.kubiya_action()
+# @action_store.kubiya_action()
 def enable_cronjob(args):
     api_client = get_batch_client()
     cron_job_name = args.get("cron_job_name")
@@ -95,7 +95,8 @@ def enable_cronjob(args):
 class CronjobsDisableInput(BaseModel):
     namespace: Optional[str] = "default"
     crons: List[CronjobDisableInput]
-@action_store.kubiya_action()
+
+# @action_store.kubiya_action()
 def disable_cronjobs(args: CronjobsDisableInput):
     logger.info(f"Scaling {len(args.crons)} deployments")
     res_dict = {}

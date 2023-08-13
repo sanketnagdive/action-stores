@@ -2,7 +2,7 @@ import time
 import threading
 from pydantic import BaseModel
 from typing import Optional, Dict, Any, List , Literal
-from . import actionstore as action_store, clients , EXCLUDED_NAMESPACES
+from . import actionstore as action_store, clients , EXCLUDED_NAMESPACES,NAMESPACES_WITH_DEPLOYMENTS ,NAMESPACES_FOR_PLAYGROUND
 from .utils import convert_datetime
 from kubernetes import client
 import logging
@@ -12,8 +12,10 @@ import json
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
+NamespacesWithDeployments=NAMESPACES_FOR_PLAYGROUND
+
 class ListDeploymentsInput(BaseModel):
-    namespace: Optional[str] = "default"
+    namespace: NamespacesWithDeployments
 
 class Deployment(BaseModel):
     deployment_name: Optional[str] = None
@@ -60,7 +62,7 @@ class RollbackDeploymentInput(BaseModel):
 
 class DeploymentLogsInput(BaseModel):
     deployment: str
-    namespace: str
+    namespace: NamespacesWithDeployments
     lines_to_tail: Optional[int] = 10
 
 class PodLogs(BaseModel):
@@ -74,8 +76,10 @@ class DeploymentUpdate(BaseModel):
     replicas: Optional[int] = None
 
 class DeploymentInfo(BaseModel):
+    namespace: NamespacesWithDeployments
     deployment_name: str
-    namespace: str
+
+
 
 @action_store.kubiya_action()
 def describe_deployment(deployment_info: DeploymentInfo):

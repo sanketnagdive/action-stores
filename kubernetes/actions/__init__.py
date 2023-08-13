@@ -1,6 +1,7 @@
 import time
 from os import environ
 from pprint import pprint
+from typing import Literal
 
 import yaml
 
@@ -19,6 +20,17 @@ EXCLUDED_NAMESPACES = ["kube-node-lease",
                        "openfaas-fn"]
 
 EXCLUDED_NAMESPACES_WITH_DEFAULT = ["default"] + EXCLUDED_NAMESPACES
+
+NAMESPACES_WITH_DEPLOYMENTS = Literal["default",
+                               "kube-system",
+                               "kubiya",
+                               "local-path-storage",
+                               "openfaas",
+                               "openfaas-fn"]
+
+NAMESPACES_FOR_PLAYGROUND = Literal["kubi-ya-world",
+                                    "kubi-ya-space",
+                                    "kubiy-ya-universe"]
 
 actionstore = ActionStore("kubernetes", "0.1.0")
 
@@ -82,3 +94,6 @@ def register_methods(actions):
 #     pprint(cli.list_namespace())
 # else:
 #     register_methods(get_v1_methods())
+
+
+

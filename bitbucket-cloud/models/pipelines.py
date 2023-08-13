@@ -1,9 +1,9 @@
 from pydantic import BaseModel,Field
 from typing import List
-
+from . import DEFAULT_BB_WORKSPACE
 
 class GetPipelineRequest(BaseModel):
-    workspace: str
+    workspace: str=DEFAULT_BB_WORKSPACE
     repo_slug: str
     pipeline_uuid: str
 
@@ -12,7 +12,7 @@ class GetPipelineResponse(BaseModel):
     pipeline: dict
 
 class GetPipelinesRequest(BaseModel):
-    workspace: str
+    workspace: str=DEFAULT_BB_WORKSPACE
     repo_slug: str
 
 
@@ -21,7 +21,7 @@ class GetPipelinesResponse(BaseModel):
 
 
 class RunPipelineRequest(BaseModel):
-    workspace: str
+    workspace: str=DEFAULT_BB_WORKSPACE
     repo_slug: str
     branch_name: str
 
@@ -29,7 +29,7 @@ class RunPipelineResponse(BaseModel):
     run: dict
 
 class StopPipelineRequest(BaseModel):
-    workspace: str
+    workspace: str=DEFAULT_BB_WORKSPACE
     repo_slug: str
     pipeline_uuid: str
 

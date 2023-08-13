@@ -20,7 +20,8 @@ def convert_datetime(data):
         elif isinstance(value, datetime):
             data[key] = value.strftime("%Y-%m-%d %H:%M:%S")
 
-@action_store.kubiya_action()
+# Filter for playgroud
+# @action_store.kubiya_action()
 def apply_object(apply_object: ApplyObject):
     """Apply a YAML or JSON object to the Kubernetes cluster"""
 
