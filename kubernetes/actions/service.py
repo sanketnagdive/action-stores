@@ -2,11 +2,11 @@ from typing import Optional, List
 from pydantic import BaseModel
 from kubernetes import client
 
-from . import actionstore as action_store
+from . import actionstore as action_store ,NameSpacesforPlayground
 from .clients import get_core_api_client
 
 class Namespace(BaseModel):
-    namespace_name: str
+    namespace_name: NameSpacesforPlayground
 
 class Service(BaseModel):
     name: str
@@ -17,7 +17,7 @@ class Service(BaseModel):
     ports: Optional[List[str]]
 
 class GetService(BaseModel):
-    namespace: str
+    namespace: NameSpacesforPlayground
     service_name: str
 
 @action_store.kubiya_action()

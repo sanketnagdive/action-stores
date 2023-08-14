@@ -1,7 +1,7 @@
 import logging
 from typing import List,Literal
 
-from . import actionstore as action_store , EXCLUDED_NAMESPACES , EXCLUDED_NAMESPACES_WITH_DEFAULT
+from . import actionstore as action_store  ,NameSpacesforPlayground ,KUBI_YA_NAMESPACES ,EXCLUDED_NAMESPACES
 from .clients import get_batch_client, get_core_api_client
 from kubernetes.client import V1Namespace
 
@@ -13,21 +13,25 @@ from .deployment import list_deployment, Deployment, DeploymentReplicasInputSing
 
 
 class NamespaceMeta(BaseModel):
+    namespace: NameSpacesforPlayground
+
+class NamespaceCreateDeleteMeta(BaseModel):
     namespace: str
+
 
 # Init logging
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 @action_store.kubiya_action()
-# Every action should recieve a param object
+# Every action should receive a param object
 def list_namespace(params):
     api_client = get_core_api_client()
     api_response = api_client.list_namespace()
-    return [item.metadata.name for item in api_response.items]
+    return [item.metadata.name for item in api_response.items if item.metadata.name not in EXCLUDED_NAMESPACES]
 
 @action_store.kubiya_action()
-def create_namespace(namespace: NamespaceMeta):
+def create_namespace(namespace: NamespaceCreateDeleteMeta):
     api_client = get_core_api_client()
     namespace_body = V1Namespace(
         metadata={
@@ -38,10 +42,10 @@ def create_namespace(namespace: NamespaceMeta):
     return {"status": "created", "namespace": api_response.metadata.name}
 
 @action_store.kubiya_action()
-def delete_namespace(namespace: NamespaceMeta):
+def delete_namespace(namespace: NamespaceCreateDeleteMeta):
     api_client = get_core_api_client()
 
-    if namespace.namespace in EXCLUDED_NAMESPACES_WITH_DEFAULT:
+    if namespace.namespace in EXCLUDED_NAMESPACES+KUBI_YA_NAMESPACES:
         return {"status": "skipped", "namespace": namespace.namespace,"message":"delete of this namespace is not allowed"}
     else:
         api_response = api_client.delete_namespace(name=namespace.namespace)

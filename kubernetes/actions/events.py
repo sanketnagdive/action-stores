@@ -2,11 +2,11 @@ from typing import Optional
 from kubernetes import client
 from pydantic import BaseModel
 
-from . import actionstore as action_store
+from . import actionstore as action_store ,NameSpacesforPlayground
 from .clients import get_core_api_client
 
 class EventFilter(BaseModel):
-    namespace: Optional[str] = None
+    namespace: NameSpacesforPlayground
 
 @action_store.kubiya_action()
 def get_events(event_filter: EventFilter):

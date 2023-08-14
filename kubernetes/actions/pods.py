@@ -2,7 +2,7 @@ from typing import Optional, List
 from kubernetes import client, stream
 from pydantic import BaseModel
 
-from . import actionstore as action_store , EXCLUDED_NAMESPACES
+from . import actionstore as action_store ,NameSpacesforPlayground,EXCLUDED_NAMESPACES
 from .clients import get_core_api_client
 
 
@@ -15,10 +15,10 @@ class NamespacePodCreateModel(BaseModel):
     namespace: str
     body: dict
 class NamespacePodModel(BaseModel):
-    namespace: str
+    namespace: NameSpacesforPlayground
     pod_name: str
 class NamespaceModel(BaseModel):
-    namespace: str
+    namespace: NameSpacesforPlayground
 
 
 class CommandModel(BaseModel):
@@ -28,12 +28,12 @@ class CommandModel(BaseModel):
 
 
 class DeletePodModel(BaseModel):
-    namespace: str
+    namespace: NameSpacesforPlayground
     pod_name: str
 
 
 class LabelModel(BaseModel):
-    namespace: str
+    namespace: NameSpacesforPlayground
     label_key: str
     label_value: str
 
@@ -61,8 +61,7 @@ def exec_command_in_pod(data: CommandModel) -> str:
 
 @action_store.kubiya_action()
 def delete_namespaced_pod(data: DeletePodModel) -> dict:
-    if data.namespace in EXCLUDED_NAMESPACES:
-        return {"error": "delete of this namespace is not allowed"}
+
     try:
         api_client = get_core_api_client()
 
@@ -91,8 +90,6 @@ def list_namespaced_pod(data: NamespaceModel) -> List[dict]:
 
 @action_store.kubiya_action()
 def get_pod_logs_by_label(data: LabelModel) -> PodLogsModel:
-    if data.namespace=="kubiya":
-        return {"error": "get logs of this namespace is not allowed"}
     try:
         api_client = get_core_api_client()
 
@@ -113,10 +110,10 @@ def get_pod_logs_by_label(data: LabelModel) -> PodLogsModel:
         return {"error": e.reason}
 
 
-@action_store.kubiya_action()
+# @action_store.kubiya_action()
 def create_namespaced_pod(data: NamespacePodCreateModel) -> dict:
-    if data.namespace in EXCLUDED_NAMESPACES:
-        return {"error": "create of this namespace is not allowed"}
+    # if data.namespace in EXCLUDED_NAMESPACES:
+    #     return {"error": "create of this namespace is not allowed"}
     try:
         api_client = get_core_api_client()
 
@@ -149,10 +146,10 @@ def create_namespaced_pod(data: NamespacePodCreateModel) -> dict:
         return {"error": e.reason}
 
 
-@action_store.kubiya_action()
+# @action_store.kubiya_action()
 def patch_namespaced_pod(data: NamespacePodPatchModel) -> dict:
-    if data.namespace in EXCLUDED_NAMESPACES:
-        return {"error": "patch of this namespace is not allowed"}
+    # if data.namespace in EXCLUDED_NAMESPACES:
+    #     return {"error": "patch of this namespace is not allowed"}
     try:
         api_client = get_core_api_client()
 
@@ -169,8 +166,6 @@ def patch_namespaced_pod(data: NamespacePodPatchModel) -> dict:
 
 @action_store.kubiya_action()
 def read_namespaced_pod(data: NamespacePodModel) -> dict:
-    if data.namespace in EXCLUDED_NAMESPACES:
-        return {"error": "read of this namespace is not allowed"}
     try:
         api_client = get_core_api_client()
 
@@ -185,10 +180,8 @@ def read_namespaced_pod(data: NamespacePodModel) -> dict:
 
 
 @action_store.kubiya_action()
-def list_failed_pods(data: NamespaceModel) -> List[str]:
-    if data.namespace in ["kubiya",
-                          "openfaas"]:
-        return {"error": "list pods of this namespace is not allowed"}
+def list_failed_pods(data) -> List[str]:
+
     try:
         api_client = get_core_api_client()
 

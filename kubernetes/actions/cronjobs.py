@@ -3,17 +3,17 @@ from typing import Optional, List
 
 from pydantic import BaseModel
 
-from . import actionstore as action_store
+from . import actionstore as action_store,NameSpacesforPlayground
 from .clients import get_batch_client
 
 class Namespace(BaseModel):
-    name: str
+    name: NameSpacesforPlayground
 
 # Init logging
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
-@action_store.kubiya_action()
+# @action_store.kubiya_action()
 def list_suspended_cronjobs(args):
     api_client = get_batch_client()
     api_response = api_client.list_cron_job_for_all_namespaces()
@@ -29,7 +29,7 @@ def list_suspended_cronjobs_for_namespace(args: Namespace):
     return [item.metadata.name for item in suspended_cronjobs]
 
 
-@action_store.kubiya_action()
+# @action_store.kubiya_action()
 def list_disabled_cronjobs_for_all_namespaces(args):
     api_client = get_batch_client()
     api_response = api_client.list_cron_job_for_all_namespaces()
@@ -38,18 +38,18 @@ def list_disabled_cronjobs_for_all_namespaces(args):
     ]
 
 @action_store.kubiya_action()
-def list_disabled_cronjobs_for_namespace(args):
+def list_disabled_cronjobs_for_namespace(args: Namespace):
     api_client = get_batch_client()
-    namespace = args.get("namespace")
+    namespace = args.name
     api_response = api_client.list_namespaced_cron_job(namespace)
     return [
         item.metadata.name for item in api_response.items if item.spec.schedule == ""
     ]
 
 @action_store.kubiya_action()
-def list_enabled_cronjobs_for_namespace(args):
+def list_enabled_cronjobs_for_namespace(args: Namespace):
     api_client = get_batch_client()
-    namespace = args.get("namespace")
+    namespace = args.name
     api_response = api_client.list_namespaced_cron_job(namespace)
     return [
         item.metadata.name for item in api_response.items if item.spec.schedule != ""
@@ -68,7 +68,7 @@ def delete_stuck_cronjob(args):
     return [item.metadata.name for item in stuck_cronjobs]
 
 class CronjobDisableInput(BaseModel):
-    namespace: Optional[str] = "default"
+    namespace: NameSpacesforPlayground
     cron_name: Optional[str] = None
 
 # @action_store.kubiya_action()
@@ -93,7 +93,7 @@ def enable_cronjob(args):
     return "cron job - {} - enabled".format(cron_job_name)
 
 class CronjobsDisableInput(BaseModel):
-    namespace: Optional[str] = "default"
+    namespace: NameSpacesforPlayground
     crons: List[CronjobDisableInput]
 
 # @action_store.kubiya_action()

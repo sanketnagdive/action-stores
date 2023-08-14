@@ -2,7 +2,7 @@ import time
 import threading
 from pydantic import BaseModel
 from typing import Optional, Dict, Any, List , Literal
-from . import actionstore as action_store, clients , EXCLUDED_NAMESPACES,NAMESPACES_WITH_DEPLOYMENTS ,NAMESPACES_FOR_PLAYGROUND
+from . import actionstore as action_store, clients ,NameSpacesforPlayground
 from .utils import convert_datetime
 from kubernetes import client
 import logging
@@ -12,18 +12,17 @@ import json
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
-NamespacesWithDeployments=NAMESPACES_FOR_PLAYGROUND
 
 class ListDeploymentsInput(BaseModel):
-    namespace: NamespacesWithDeployments
+    namespace: NameSpacesforPlayground
 
 class Deployment(BaseModel):
     deployment_name: Optional[str] = None
-    namespace: Optional[str] = "default"
+    namespace: NameSpacesforPlayground
 
 class DeploymentReplicasInput(BaseModel):
     deployment_name: Optional[str] = None
-    namespace: Optional[str] = "default"
+    namespace: NameSpacesforPlayground
     replicas: Optional[int] = None
 
 class DeploymentReplicasInputSingle(BaseModel):
@@ -31,25 +30,25 @@ class DeploymentReplicasInputSingle(BaseModel):
     replicas: Optional[int] = None
 
 class DeploymentsReplicasInput(BaseModel):
-    namespace: Optional[str] = "default"
+    namespace: NameSpacesforPlayground
     inputs: List[DeploymentReplicasInputSingle]
 
 
 class DeploymentImageInput(BaseModel):
     deployment_name: Optional[str] = None
-    namespace: Optional[str] = "default"
+    namespace: NameSpacesforPlayground
     image: Optional[str] = None
 
-# For playground - limit to default namespace
-NamespaceType=Literal["default"]
+# # For playground - limit to default namespace
+# NamespaceType=Literal["default"]
 class DeploymentBodyInput(BaseModel):
     deployment_name: Optional[str] = None
-    namespace: NamespaceType
+    namespace: NameSpacesforPlayground
     body: Dict[str, Any] = {}
 
 class DeploymentStatusInput(BaseModel):
     deployment_name: str
-    namespace: Optional[str] = "default"
+    namespace: NameSpacesforPlayground
 
 class DeploymentStatus(BaseModel):
     available_replicas: int
@@ -58,11 +57,11 @@ class DeploymentStatus(BaseModel):
 
 class RollbackDeploymentInput(BaseModel):
     deployment_name: str
-    namespace: Optional[str] = "default"
+    namespace: NameSpacesforPlayground
 
 class DeploymentLogsInput(BaseModel):
     deployment: str
-    namespace: NamespacesWithDeployments
+    namespace: NameSpacesforPlayground
     lines_to_tail: Optional[int] = 10
 
 class PodLogs(BaseModel):
@@ -71,12 +70,12 @@ class PodLogs(BaseModel):
 
 class DeploymentUpdate(BaseModel):
     deployment_name: str
-    namespace: str
+    namespace: NameSpacesforPlayground
     image: Optional[str] = None
     replicas: Optional[int] = None
 
 class DeploymentInfo(BaseModel):
-    namespace: NamespacesWithDeployments
+    namespace: NameSpacesforPlayground
     deployment_name: str
 
 
@@ -101,10 +100,8 @@ def describe_deployment(deployment_info: DeploymentInfo):
     except client.rest.ApiException as e:
         return {"error": e.reason}
 
-@action_store.kubiya_action()
+# @action_store.kubiya_action()
 def update_deployment(deployment_update: DeploymentUpdate):
-    if deployment_update.namespace in EXCLUDED_NAMESPACES:
-        return {"error": f"Namespace {deployment_update.namespace} is excluded from this action"}
 
     try:
         apps_api = clients.get_apps_client()
@@ -132,9 +129,6 @@ def update_deployment(deployment_update: DeploymentUpdate):
 
 @action_store.kubiya_action()
 def get_deployment_logs(input_data: DeploymentLogsInput) -> List[PodLogs]:
-
-    if input_data.namespace=="kubiya":
-        return {"error": "Namespace kubiya is excluded from this action"}
 
     try:
         apps_v1_api = clients.get_apps_client()
@@ -169,8 +163,7 @@ def get_deployment_logs(input_data: DeploymentLogsInput) -> List[PodLogs]:
 
 @action_store.kubiya_action()
 def rollback_deployment(input_data: RollbackDeploymentInput):
-    if input_data.namespace in EXCLUDED_NAMESPACES:
-        return {"error": f"Namespace {input_data.namespace} is excluded from this action"}
+
     try:
         apps_v1_api = clients.get_apps_client()
         rollback_options = client.V1RollbackConfig(
@@ -253,8 +246,7 @@ def rollout_status(deployment_info: Deployment):
 
 @action_store.kubiya_action()
 def rollout_restart_deployment(params: Deployment):
-    if params.namespace in EXCLUDED_NAMESPACES:
-        return {"error": f"Namespace {params.namespace} is excluded from this action"}
+
     logger.info("Restarting deployment " + params.deployment_name)
     api_client = clients.get_apps_client()
 
@@ -281,8 +273,7 @@ def rollout_restart_deployment(params: Deployment):
 
 # @action_store.kubiya_action()
 def set_deployment_image(args):
-    if args.get("namespace") in EXCLUDED_NAMESPACES:
-        return {"error": f"Namespace {args.get('namespace')} is excluded from this action"}
+
     try:
         logger.info("Setting image for deployment " + args.get("deployment_name"))
         api_client = clients.get_apps_client()
@@ -293,24 +284,24 @@ def set_deployment_image(args):
     except api_client.rest.ApiException as e:
         return {"error": e.reason}
 
-# @action_store.kubiya_action()
-def get_deployment_image(args):
+@action_store.kubiya_action()
+def get_deployment_image(args:Deployment):
     try:
-        logger.info("Getting image for deployment " + args.get("deployment_name"))
+        logger.info("Getting image for deployment " + args.deployment_name)
         api_client = clients.get_apps_client()
-        api_response = api_client.read_namespaced_deployment(args.get("deployment_name"), args.get("namespace"))
+        api_response = api_client.read_namespaced_deployment(args.deployment_name, args.namespace)
         return api_response.spec.template.spec.containers[0].image
     except api_client.rest.ApiException as e:
         logger.error(e.reason)
         return {"error": e.reason}
     
-# @action_store.kubiya_action()
-def get_deployment_replicas(args):
+@action_store.kubiya_action()
+def get_deployment_replicas(args:Deployment):
     try:
-        logger.info("Getting replicas for deployment " + args.get("deployment_name"))
+        logger.info("Getting replicas for deployment " + args.deployment_name)
         api_client = clients.get_apps_client()
-        api_response = api_client.read_namespaced_deployment(args.get("deployment_name"), args.get("namespace"))
-        logger.info("Replicas for deployment " + args.get("deployment_name") + " is " + str(api_response.spec.replicas))
+        api_response = api_client.read_namespaced_deployment(args.deployment_name, args.namespace)
+        logger.info("Replicas for deployment " + args.deployment_name + " is " + str(api_response.spec.replicas))
         return api_response.spec.replicas
     except api_client.rest.ApiException as e:
         logger.error(e.reason)
@@ -320,9 +311,9 @@ def get_deployment_replicas(args):
 def set_deployment_replicas(args: DeploymentReplicasInput):
     try:
         api_client = clients.get_apps_client()
-        api_response = api_client.read_namespaced_deployment(args.get("deployment_name"), args.get("namespace"))
-        api_response.spec.replicas = args.get("replicas")
-        api_response = api_client.patch_namespaced_deployment(args.get("deployment_name"), args.get("namespace"), api_response)
+        api_response = api_client.read_namespaced_deployment(args.deployment_name, args.namespace)
+        api_response.spec.replicas = args.replicas
+        api_response = api_client.patch_namespaced_deployment(args.deployment_name, args.namespace, api_response)
         return api_response.spec.replicas
     except api_client.rest.ApiException as e:
         logger.error(e.reason)
@@ -338,8 +329,6 @@ def list_deployment(params: ListDeploymentsInput):
 
 @action_store.kubiya_action()
 def scale_deployment(params: DeploymentReplicasInput):
-    if params.namespace in EXCLUDED_NAMESPACES:
-        return {"error": f"Namespace {params.namespace} is excluded from this action"}
     try:
         logger.info(f"Scaling deployment {params.deployment_name} to {params.replicas} replicas")
         api_client = clients.get_apps_client()
@@ -353,8 +342,8 @@ def scale_deployment(params: DeploymentReplicasInput):
 
 @action_store.kubiya_action()
 def scale_deployments(params: DeploymentsReplicasInput):
-    if params.namespace in EXCLUDED_NAMESPACES:
-        return {"error": f"Namespace {params.namespace} is excluded from this action"}
+    # if params.namespace in EXCLUDED_NAMESPACES:
+    #     return {"error": f"Namespace {params.namespace} is excluded from this action"}
     logger.info(f"Scaling {len(params.inputs)} deployments")
     res_dict = {}
     for i, _input in enumerate(params.inputs):
@@ -381,10 +370,8 @@ def scale_deployments(params: DeploymentsReplicasInput):
         return {"success": success, "failed": failed, "error": failed}
     return {"success": success, "failed": failed}
 
-@action_store.kubiya_action()
+# @action_store.kubiya_action()
 def delete_deployment(params: Deployment):
-    if params.namespace in EXCLUDED_NAMESPACES:
-        return {"error": f"Namespace {params.namespace} is excluded from this action"}
     try:
         logger.info(f"Deleting deployment {params.deployment_name}")
         api_client = clients.get_apps_client()
@@ -396,8 +383,6 @@ def delete_deployment(params: Deployment):
 
 @action_store.kubiya_action()
 def check_deployment_status(params: Deployment):
-    if params.namespace in EXCLUDED_NAMESPACES:
-        return {"error": f"Namespace {params.namespace} is excluded from this action"}
     try:
         logger.info(f"Checking deployment status for {params.deployment_name}")
         api_client = clients.get_apps_client()
@@ -407,10 +392,8 @@ def check_deployment_status(params: Deployment):
         logger.error(e.reason)
         return {"error": e.reason}
 
-@action_store.kubiya_action()
+# @action_store.kubiya_action()
 def create_deployment(params: DeploymentBodyInput):
-    if params.namespace in EXCLUDED_NAMESPACES:
-        return {"error": f"Namespace {params.namespace} is excluded from this action"}
     try:
         logger.info(f"Creating deployment {params.deployment_name}")
         api_client = clients.get_apps_client()

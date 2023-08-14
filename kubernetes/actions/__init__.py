@@ -10,7 +10,12 @@ from kubiya import ActionStore, get_secret
 
 from kubernetes import client, config
 
-EXCLUDED_NAMESPACES = ["kube-node-lease",
+KUBI_YA_NAMESPACES = ["kubi-ya-world",
+                      "kubi-ya-space",
+                      "kubiy-ya-universe"]
+
+EXCLUDED_NAMESPACES = ["default",
+                       "kube-node-lease",
                        "kubiya",
                        "local-path-storage",
                        "kube-system",
@@ -19,18 +24,18 @@ EXCLUDED_NAMESPACES = ["kube-node-lease",
                        "openfaas",
                        "openfaas-fn"]
 
-EXCLUDED_NAMESPACES_WITH_DEFAULT = ["default"] + EXCLUDED_NAMESPACES
 
-NAMESPACES_WITH_DEPLOYMENTS = Literal["default",
+
+NAMESPACES_WITH_DEPLOYMENTS = ["default",
                                "kube-system",
                                "kubiya",
                                "local-path-storage",
                                "openfaas",
-                               "openfaas-fn"]
+                               "openfaas-fn"]+KUBI_YA_NAMESPACES
 
-NAMESPACES_FOR_PLAYGROUND = Literal["kubi-ya-world",
-                                    "kubi-ya-space",
-                                    "kubiy-ya-universe"]
+NAMESPACES_FOR_PLAYGROUND = Literal[*KUBI_YA_NAMESPACES]
+
+NameSpacesforPlayground = NAMESPACES_FOR_PLAYGROUND
 
 actionstore = ActionStore("kubernetes", "0.1.0")
 
