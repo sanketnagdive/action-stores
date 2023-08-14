@@ -9,7 +9,6 @@ class SingleDict(BaseModel):
     response: dict
 
 class ListMergeRequests(BaseModel):
-    id: Union[int, str] = Field(..., description='The ID or URL-encoded path of the project owned by the authenticated user.')
     approved_by_ids: Optional[List[int]] = Field(None, description='Returns merge requests which have been approved by all the users with the given id. Maximum of 5. None returns merge requests with no approvals. Any returns merge requests with an approval.')
     approver_ids: Optional[List[int]] = Field(None, description='Returns merge requests which have specified all the users with the given id as individual approvers. None returns merge requests without approvers. Any returns merge requests with an approver.')
     approved: Optional[str] = Field(None, description='Filters merge requests by their approved status. yes returns only approved merge requests. no returns only non-approved merge requests.')
@@ -41,8 +40,9 @@ class ListMergeRequests(BaseModel):
     with_labels_details: Optional[bool] = Field(None, description='If true, response returns more details for each label in labels field: :name, :color, :description, :description_html, :text_color. Default is false.')
     with_merge_status_recheck: Optional[bool] = Field(None, description='If true, this projection requests (but does not guarantee) that the merge_status field be recalculated asynchronously. Default is false.')
     wip: Optional[str] = Field(None, description='Filter merge requests against their wip status. yes to return only draft merge requests, no to return non-draft merge requests.')
+
 class ListProjectMergeRequests(BaseModel):
-    id: Union[int, str] = Field(..., description='The ID or URL-encoded path of the project owned by the authenticated user.')
+    id: Union[int, str] = Field(...,description='The ID or URL-encoded path of the project owned by the authenticated user.')
     approved_by_ids: Optional[List[int]] = Field(None, description='Returns merge requests which have been approved by all the users with the given id. Maximum of 5. None returns merge requests with no approvals. Any returns merge requests with an approval.')
     approver_ids: Optional[List[int]] = Field(None, description='Returns merge requests which have specified all the users with the given id as individual approvers. None returns merge requests without approvers. Any returns merge requests with an approver.')
     approved: Optional[str] = Field(None, description='Filters merge requests by their approved status. yes returns only approved merge requests. no returns only non-approved merge requests.')
@@ -72,8 +72,9 @@ class ListProjectMergeRequests(BaseModel):
     wip: Optional[str] = Field(None, description='Filter merge requests against their wip status. yes to return only draft merge requests, no to return non-draft merge requests.')
     with_labels_details: Optional[bool] = Field(None, description='If true, response returns more details for each label in labels field: :name, :color, :description, :description_html, :text_color. Default is false.')
     with_merge_status_recheck: Optional[bool] = Field(None, description='If true, this projection requests (but does not guarantee) that the merge_status field be recalculated asynchronously. Default is false.')
+
 class ListGroupMergeRequests(BaseModel):
-    id: Union[int, str] = Field(..., description='The ID or URL-encoded path of the group owned by the authenticated user.')
+    id: Union[int, str] = Field(...,description='The ID or URL-encoded path of the group owned by the authenticated user.')
     approved_by_ids: Optional[List[int]] = Field(None, description='Returns merge requests which have been approved by all the users with the given id. Maximum of 5. None returns merge requests with no approvals. Any returns merge requests with an approval.')
     approved_by_usernames: Optional[List[str]] = Field(None, description='Returns merge requests which have been approved by all the users with the given username. Maximum of 5. None returns merge requests with no approvals. Any returns merge requests with an approval.')
     approver_ids: Optional[List[int]] = Field(None, description='Returns merge requests which have specified all the users with the given id as individual approvers. None returns merge requests without approvers. Any returns merge requests with an approver.')
@@ -102,33 +103,41 @@ class ListGroupMergeRequests(BaseModel):
     view: Optional[str] = Field(None, description='If simple, returns the iid, URL, title, description, and basic state of merge request.')
     with_labels_details: Optional[bool] = Field(None, description='If true, response returns more details for each label in labels field: :name, :color, :description, :description_html, :text_color. Default is false.')
     with_merge_status_recheck: Optional[bool] = Field(None, description='If true, this projection requests (but does not guarantee) that the merge_status field be recalculated asynchronously. Default is false.')
+
 class GetSingleMR(BaseModel):
     id: Union[int, str] = Field(..., description='The ID or URL-encoded path of the project owned by the authenticated user.')
     merge_request_iid: int = Field(..., description='The internal ID of the merge request.')
     include_diverged_commits_count: Optional[bool] = Field(None, description='If true, response includes the commits behind the target branch.')
     include_rebase_in_progress: Optional[bool] = Field(None, description='If true, response includes whether a rebase operation is in progress.')
     render_html: Optional[bool] = Field(None, description='If true, response includes rendered HTML for title and description.')
+
 class GetMergeRequestParticipants(BaseModel):
     id: Union[int, str] = Field(..., description='The ID or URL-encoded path of the project owned by the authenticated user.')
     merge_request_iid: int = Field(..., description='The internal ID of the merge request.')
+
 class GetMergeRequestCommits(BaseModel):
     id: Union[int, str] = Field(..., description='The ID or URL-encoded path of the project owned by the authenticated user.')
     merge_request_iid: int = Field(..., description='The internal ID of the merge request.')
+
 class GetMergeRequestChanges(BaseModel):
     id: Union[int, str] = Field(..., description='The ID or URL-encoded path of the project owned by the authenticated user.')
     merge_request_iid: int = Field(..., description='The internal ID of the merge request.')
     access_raw_diffs: Optional[bool] = Field(None, description='Retrieve change diffs via Gitaly.')
+
 class ListMergeRequestDiffs(BaseModel):
     id: Union[int, str] = Field(..., description='The ID or URL-encoded path of the project owned by the authenticated user.')
     merge_request_iid: int = Field(..., description='The internal ID of the merge request.')
     page: Optional[int] = Field(None, description='The page of results to return.')
     per_page: Optional[int] = Field(None, description='The number of results per page.')
+
 class ListMergeRequestPipelines(BaseModel):
     id: Union[int, str] = Field(..., description='The ID or URL-encoded path of the project owned by the authenticated user.')
     merge_request_iid: int = Field(..., description='The internal ID of the merge request.')
+
 class CreateMergeRequestPipeline(BaseModel):
     id: Union[int, str] = Field(..., description='The ID or URL-encoded path of the project owned by the authenticated user.')
     merge_request_iid: int = Field(..., description='The internal ID of the merge request.')
+
 class ProjectsMergeRequestCreate(BaseModel):
     id: Union[int, str] = Field(description='The ID or URL-encoded path of the project owned by the authenticated user.')
     source_branch: str = Field(description='The source branch name.')
@@ -147,6 +156,7 @@ class ProjectsMergeRequestCreate(BaseModel):
     squash: Optional[bool] = Field(None, description='Squash commits into a single commit when merging.')
     squash_on_merge: Optional[bool] = Field(None, description='Squash commits into a single commit after merging.')
     target_project_id: Optional[int] = Field(None, description='The target project ID. If the user is a maintainer of the target project, the source project is set as the target_project_id.')
+
 class UpdateMergeRequest(BaseModel):
     id: Union[int, str] = Field(..., description='The ID or URL-encoded path of the project owned by the authenticated user.')
     merge_request_iid: int = Field(..., description='The internal ID of the merge request.')
@@ -167,9 +177,11 @@ class UpdateMergeRequest(BaseModel):
     state_event: Optional[str] = Field(None, description='New state (close/reopen).')
     target_branch: Optional[str] = Field(None, description='The target branch.')
     title: Optional[str] = Field(None, description='Title of MR.')
+
 class DeleteMergeRequest(BaseModel):
     id: Union[int, str] = Field(..., description='The ID or URL-encoded path of the project owned by the authenticated user.')
     merge_request_iid: int = Field(..., description='The internal ID of the merge request.')
+
 class MergeMergeRequest(BaseModel):
     id: Union[int, str] = Field(..., description='The ID or URL-encoded path of the project owned by the authenticated user.')
     merge_request_iid: int = Field(..., description='The internal ID of the merge request.')
@@ -179,41 +191,13 @@ class MergeMergeRequest(BaseModel):
     should_remove_source_branch: Optional[bool] = Field(None, description='If true, removes the source branch.')
     squash_commit_message: Optional[str] = Field(None, description='Custom squash commit message.')
     squash: Optional[bool] = Field(None, description='If true, the commits are squashed into a single commit on merge.')
-class MergeToDefaultMergeRefPath(BaseModel):
-    id: Union[int, str] = Field(..., description='The ID or URL-encoded path of the project owned by the authenticated user.')
-    merge_request_iid: int = Field(..., description='The internal ID of the merge request.')
-class CancelMergeWhenPipelineSucceeds(BaseModel):
-    id: Union[int, str] = Field(..., description='The ID or URL-encoded path of the project owned by the authenticated user.')
-    merge_request_iid: int = Field(..., description='The internal ID of the merge request.')
+
 class RebaseMergeRequest(BaseModel):
     id: Union[int, str] = Field(..., description='The ID or URL-encoded path of the project owned by the authenticated user.')
     merge_request_iid: int = Field(..., description='The internal ID of the merge request.')
     skip_ci: Optional[bool] = Field(None, description='Set to true to skip creating a CI pipeline.')
-class ListIssuesThatCloseOnMerge(BaseModel):
-    id: Union[int, str] = Field(..., description='The ID or URL-encoded path of the project owned by the authenticated user.')
-    merge_request_iid: int = Field(..., description='The internal ID of the merge request.')
-class SubscribeMergeRequest(BaseModel):
-    id: Union[int, str] = Field(description='The ID or URL-encoded path of the project owned by the authenticated user.')
-    merge_request_iid: int = Field(description='The internal ID of the merge request.')
-class UnsubscribeMergeRequest(SubscribeMergeRequest):
-    pass
-class CreateTodoItem(SubscribeMergeRequest):
-    pass
-class GetMergeRequestDiffVersions(SubscribeMergeRequest):
-    pass
+
 class GetSingleMergeRequestDiffVersion(BaseModel):
     id: Union[int, str] = Field(description='The ID or URL-encoded path of the project owned by the authenticated user.')
     merge_request_iid: int = Field(description='The internal ID of the merge request.')
     version_id: int = Field(description='The ID of the merge request diff version.')
-class SetTimeEstimateMergeRequest(BaseModel):
-    id: Union[int, str] = Field(description='The ID or URL-encoded path of the project owned by the authenticated user.')
-    merge_request_iid: int = Field(description='The internal ID of the merge request.')
-    duration: str = Field(description='The duration in human format, such as 3h30m.')
-class ResetTimeEstimateMergeRequest(SubscribeMergeRequest):
-    pass
-class AddSpentTimeMergeRequest(SetTimeEstimateMergeRequest):
-    summary: Optional[str] = Field(None, description='A summary of how the time was spent.')
-class ResetSpentTimeMergeRequest(SubscribeMergeRequest):
-    pass
-class GetTimeTrackingStatsMergeRequest(SubscribeMergeRequest):
-    pass

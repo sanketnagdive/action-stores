@@ -34,7 +34,7 @@ def get_merge_request_commits(input: GetMergeRequestCommits):
 @action_store.kubiya_action()
 def get_merge_request_changes(input: GetMergeRequestChanges):
     response = get_wrapper(endpoint=f'/projects/{input.id}/merge_requests/{input.merge_request_iid}/changes', args=input.dict(exclude_none=True))
-    return ListDict(response=response)
+    return SingleDict(response=response)
 
 @action_store.kubiya_action()
 def list_merge_request_diffs(input: ListMergeRequestDiffs):
@@ -75,11 +75,6 @@ def merge_merge_request(input: MergeMergeRequest):
 def rebase_merge_request(input: RebaseMergeRequest):
     response = put_wrapper(endpoint=f'/projects/{input.id}/merge_requests/{input.merge_request_iid}/rebase', args=input.dict(exclude_none=True))
     return SingleDict(response=response)
-
-@action_store.kubiya_action()
-def get_merge_request_diff_versions(input: GetMergeRequestDiffVersions):
-    response = get_wrapper(endpoint=f'/projects/{input.id}/merge_requests/{input.merge_request_iid}/versions', args=input.dict(exclude_none=True))
-    return ListDict(response=response)
 
 @action_store.kubiya_action()
 def get_single_merge_request_diff_version(input: GetSingleMergeRequestDiffVersion):
