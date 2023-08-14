@@ -24,7 +24,7 @@ def get_open_pull_requests(input: GetOpenPullRequestsParams)->GetOpenPullRequest
 
 
 
-@action_store.kubiya_action()
+# @action_store.kubiya_action()
 def merge_pull_request(input: MergePrParams):
     client = get_client(input.workspace)
     res = client._post("2.0/repositories/{}/{}/pullrequests/{}/merge".format(input.workspace,
@@ -34,7 +34,7 @@ def merge_pull_request(input: MergePrParams):
     return MergePrResponse(response=res)
 
 
-@action_store.kubiya_action()
+# @action_store.kubiya_action()
 def create_pull_request(input: CreatePrParams):
     client = get_client(input.workspace)
     res = client._post("2.0/repositories/{}/{}/pullrequests".format(input.workspace,input.repository_slug),

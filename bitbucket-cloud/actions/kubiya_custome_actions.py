@@ -14,7 +14,7 @@ from ..models.kubiya_custome import (
 
 
 
-@action_store.kubiya_action()
+# @action_store.kubiya_action()
 def edit_yaml_file(input: EditYamlFileParams)->EditYamlFileResponse:
     client = get_client(input.workspace)
 

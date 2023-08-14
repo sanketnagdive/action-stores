@@ -14,7 +14,7 @@ from ..models.issues import (
 )
 
 
-@action_store.kubiya_action()
+# @action_store.kubiya_action()
 def get_issue(input: GetIssueParams )->GetIssueResponse:
     client = get_client(input.workspace)
     issue = client._get("2.0/repositories/{}/{}/issues/{}".format(input.workspace,
@@ -44,7 +44,7 @@ def create_issue(input: CreateIssueParams )->CreateIssueResponse:
 
     return CreateIssueResponse(issue=issue)
 
-@action_store.kubiya_action()
+# @action_store.kubiya_action()
 def delete_issue(input: DeleteIssueParams )->DeleteIssueResponse:
     client=get_client(input.workspace)
     response = client._delete("2.0/repositories/{}/{}/issues/{}".format(input.workspace,

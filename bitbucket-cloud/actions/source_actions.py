@@ -13,7 +13,7 @@ from ..models.sources import (
 )
 
 
-@action_store.kubiya_action()
+# @action_store.kubiya_action()
 def get_file_content(input: GetFileContentParams)->GetFileContentResponse:
     client = get_client(input.workspace)
     file_content=client._get("2.0/repositories/{}/{}/src/{}/{}".format(input.workspace,
@@ -24,7 +24,7 @@ def get_file_content(input: GetFileContentParams)->GetFileContentResponse:
     return GetFileContentResponse(content=file_content)
 
 
-@action_store.kubiya_action()
+# @action_store.kubiya_action()
 def upload_file(input: UploadFileParams)->UploadFileResponse:
     client = get_client(input.workspace)
 

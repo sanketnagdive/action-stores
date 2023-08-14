@@ -1,10 +1,10 @@
 from pydantic import BaseModel
 from typing import List
-from . import DEFAULT_BB_WORKSPACE
+from . import DEFAULT_BB_WORKSPACE,BitBucketPlayGroundRepos
 
 class GetRepositoryParams(BaseModel):
     workspace: str= DEFAULT_BB_WORKSPACE
-    repo_slug: str
+    repo_slug: BitBucketPlayGroundRepos
 
 class GetRepositoryResponse(BaseModel):
     repo: dict

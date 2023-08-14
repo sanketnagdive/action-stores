@@ -14,7 +14,7 @@ from ..models.pipelines import (
 )
 
 
-@action_store.kubiya_action()
+# @action_store.kubiya_action()
 def get_pipeline(input: GetPipelineRequest )->GetPipelineResponse:
     client = get_client(input.workspace)
     pipelines = client._get("2.0/repositories/{}/{}/pipelines/{}".format(input.workspace,

@@ -21,7 +21,7 @@ def get_repository(input: GetRepositoryParams)->GetRepositoryResponse:
 
     return GetRepositoryResponse(repo=repo)
 
-@action_store.kubiya_action()
+# @action_store.kubiya_action()
 def create_repository(input: CreateRepositoryParams)->CreateRepositoryResponse:
 
     client = get_client(input.workspace)
