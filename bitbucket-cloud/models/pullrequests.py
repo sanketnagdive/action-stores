@@ -1,8 +1,8 @@
 from pydantic import BaseModel
 from typing import List
-from . import DEFAULT_BB_WORKSPACE, BitBucketPlayGroundRepos , DEFAULT_BRANCH
+from . import DEFAULT_BB_WORKSPACE, BitBucketPlayGroundRepos , DEFAULT_BRANCH , BitBucketPlayGroundWorkspace
 class GetOpenPullRequestsParams(BaseModel):
-    workspace: str= DEFAULT_BB_WORKSPACE
+    workspace: BitBucketPlayGroundWorkspace
     repository_slug: BitBucketPlayGroundRepos
 
 class GetOpenPullRequestsResponse(BaseModel):
@@ -10,7 +10,7 @@ class GetOpenPullRequestsResponse(BaseModel):
 
 
 class MergePrParams(BaseModel):
-    workspace: str= DEFAULT_BB_WORKSPACE
+    workspace: BitBucketPlayGroundWorkspace
     repository_slug: BitBucketPlayGroundRepos
     pull_request_id: str
 
@@ -19,7 +19,7 @@ class MergePrResponse(BaseModel):
 
 
 class CreatePrParams(BaseModel):
-    workspace: str= DEFAULT_BB_WORKSPACE
+    workspace: BitBucketPlayGroundWorkspace
     repository_slug: BitBucketPlayGroundRepos
     title: str
     source_branch: str

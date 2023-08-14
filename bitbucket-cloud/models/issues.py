@@ -1,9 +1,9 @@
 from pydantic import BaseModel
 from typing import List
-from . import DEFAULT_BB_WORKSPACE , BitBucketPlayGroundRepos
+from . import DEFAULT_BB_WORKSPACE , BitBucketPlayGroundRepos, BitBucketPlayGroundWorkspace
 
 class GetIssueParams(BaseModel):
-    workspace: str=DEFAULT_BB_WORKSPACE
+    workspace: BitBucketPlayGroundWorkspace
     repository_slug: BitBucketPlayGroundRepos
     issue_id: str
 
@@ -12,14 +12,14 @@ class GetIssueResponse(BaseModel):
 
 
 class GetIssuesParams(BaseModel):
-    workspace: str=DEFAULT_BB_WORKSPACE
+    workspace: BitBucketPlayGroundWorkspace
     repository_slug: BitBucketPlayGroundRepos
 
 class GetIssuesResponse(BaseModel):
     issues: List[dict]
 
 class CreateIssueParams(BaseModel):
-    workspace: str=DEFAULT_BB_WORKSPACE
+    workspace: BitBucketPlayGroundWorkspace
     repo_slug: BitBucketPlayGroundRepos
     type: str
     title: str
@@ -30,7 +30,7 @@ class CreateIssueResponse(BaseModel):
     issue: dict
 
 class DeleteIssueParams(BaseModel):
-    workspace: str=DEFAULT_BB_WORKSPACE
+    workspace: BitBucketPlayGroundWorkspace
     repo_slug: BitBucketPlayGroundRepos
     issue_id: str
 

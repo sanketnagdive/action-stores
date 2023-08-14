@@ -1,9 +1,9 @@
 from pydantic import BaseModel
 from typing import List
-from . import DEFAULT_BB_WORKSPACE,BitBucketPlayGroundRepos
+from . import DEFAULT_BB_WORKSPACE,BitBucketPlayGroundRepos ,BitBucketPlayGroundWorkspace
 
 class GetRepositoryParams(BaseModel):
-    workspace: str= DEFAULT_BB_WORKSPACE
+    workspace: BitBucketPlayGroundWorkspace
     repo_slug: BitBucketPlayGroundRepos
 
 class GetRepositoryResponse(BaseModel):
@@ -11,7 +11,7 @@ class GetRepositoryResponse(BaseModel):
 
 
 class CreateRepositoryParams(BaseModel):
-    workspace: str = DEFAULT_BB_WORKSPACE
+    workspace: BitBucketPlayGroundWorkspace
     repo_slug: str
     is_private: bool
 
@@ -19,7 +19,7 @@ class CreateRepositoryResponse(BaseModel):
     response: dict
 
 class GetRepositoriesParams(BaseModel):
-    workspace: str = DEFAULT_BB_WORKSPACE
+    workspace: BitBucketPlayGroundWorkspace
 
 
 class Repository(BaseModel):

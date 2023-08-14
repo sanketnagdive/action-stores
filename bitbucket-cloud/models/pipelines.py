@@ -1,9 +1,9 @@
 from pydantic import BaseModel,Field
 from typing import List
-from . import DEFAULT_BB_WORKSPACE , BitBucketPlayGroundRepos, DEFAULT_BRANCH
+from . import DEFAULT_BB_WORKSPACE , BitBucketPlayGroundRepos, DEFAULT_BRANCH, BitBucketPlayGroundWorkspace
 
 class GetPipelineRequest(BaseModel):
-    workspace: str=DEFAULT_BB_WORKSPACE
+    workspace: BitBucketPlayGroundWorkspace
     repo_slug: BitBucketPlayGroundRepos
     pipeline_uuid: str
 
@@ -12,7 +12,7 @@ class GetPipelineResponse(BaseModel):
     pipeline: dict
 
 class GetPipelinesRequest(BaseModel):
-    workspace: str=DEFAULT_BB_WORKSPACE
+    workspace: BitBucketPlayGroundWorkspace
     repo_slug: BitBucketPlayGroundRepos
 
 
@@ -21,7 +21,7 @@ class GetPipelinesResponse(BaseModel):
 
 
 class RunPipelineRequest(BaseModel):
-    workspace: str=DEFAULT_BB_WORKSPACE
+    workspace: BitBucketPlayGroundWorkspace
     repo_slug: BitBucketPlayGroundRepos
     branch_name: str=DEFAULT_BRANCH
 
@@ -29,7 +29,7 @@ class RunPipelineResponse(BaseModel):
     run: dict
 
 class StopPipelineRequest(BaseModel):
-    workspace: str=DEFAULT_BB_WORKSPACE
+    workspace: BitBucketPlayGroundWorkspace
     repo_slug: BitBucketPlayGroundRepos
     pipeline_uuid: str
 

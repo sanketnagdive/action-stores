@@ -1,9 +1,9 @@
 from pydantic import BaseModel
 from typing import List
-from . import DEFAULT_BB_WORKSPACE,BitBucketPlayGroundRepos,DEFAULT_BRANCH
+from . import DEFAULT_BB_WORKSPACE,BitBucketPlayGroundRepos,DEFAULT_BRANCH ,BitBucketPlayGroundWorkspace
 
 class GetFileContentParams(BaseModel):
-    workspace: str = DEFAULT_BB_WORKSPACE
+    workspace: BitBucketPlayGroundWorkspace
     repository: BitBucketPlayGroundRepos
     file_path: str
     commit_id: str
@@ -13,7 +13,7 @@ class GetFileContentResponse(BaseModel):
 
 
 class UploadFileParams(BaseModel):
-    workspace: str=DEFAULT_BB_WORKSPACE
+    workspace: BitBucketPlayGroundWorkspace
     repository_slug: str
     branch: str
     commit_message: str
@@ -30,7 +30,7 @@ class RepositoryStructure(BaseModel):
     commit_hash: str
 
 class GetRepositoryStructureParams(BaseModel):
-    workspace: str= DEFAULT_BB_WORKSPACE
+    workspace: BitBucketPlayGroundWorkspace
     repository_slug: BitBucketPlayGroundRepos
     branch_or_commit: str=DEFAULT_BRANCH
     path: str=""

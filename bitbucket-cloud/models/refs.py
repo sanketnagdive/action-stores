@@ -1,8 +1,8 @@
 from pydantic import BaseModel
 from typing import List
-from . import DEFAULT_BB_WORKSPACE , BitBucketPlayGroundRepos
+from . import DEFAULT_BB_WORKSPACE , BitBucketPlayGroundRepos , BitBucketPlayGroundWorkspace
 class GetRepositoryBranchesParams(BaseModel):
-    workspace: str= DEFAULT_BB_WORKSPACE
+    workspace: BitBucketPlayGroundWorkspace
     repository_slug: BitBucketPlayGroundRepos
 
 class Branch(BaseModel):
