@@ -6,6 +6,7 @@ from ..models.issue import (
     GetIssueParams, GetIssueResponse
 )
 from .. import action_store as action_store
+
 import logging
 
 logger = logging.getLogger(__name__)
@@ -32,7 +33,7 @@ def close_issue(params: CloseIssueParams) -> CloseIssueResponse:
         entity = get_entity(github)
         repo = entity.get_repo(params.repo_name)
         issue = repo.get_issue(number=params.issue_number)
-        issue.edit(state=Issue.IssueState.closed)
+        issue.edit(state='closed')
         return CloseIssueResponse(success=True)
     except GithubException as e:
         logger.error(f"Failed to close issue: {e}")

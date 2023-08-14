@@ -33,7 +33,7 @@ def list_workflow_runs(params: ListWorkflowRunsParams) -> ListWorkflowRunsRespon
         for workflow_run in repo.get_workflow_runs():
             workflow_run_model = WorkflowRunModel(
                 id=workflow_run.id,
-                workflow_name=workflow_run.workflow.name,
+                workflow_name=workflow_run.name,
                 created_at=str(workflow_run.created_at),
                 updated_at=str(workflow_run.updated_at),
                 status=workflow_run.status,
@@ -53,8 +53,11 @@ def trigger_workflow(params: TriggerWorkflowParams) -> TriggerWorkflowResponse:
         entity = get_entity(github)
         repo = entity.get_repo(params.repo_name)
         workflow = repo.get_workflow(params.workflow_id)
-        workflow_run = workflow.create_dispatch(event_type=params.event_type)
-        return TriggerWorkflowResponse(workflow_run_id=workflow_run.id, workflow_run_url=workflow_run.html_url)
+        # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#workflow_dispatch
+        workflow_run = workflow.create_dispatch(ref=params.branch)
+
+        if workflow_run:
+            return TriggerWorkflowResponse(success=True)
     except GithubException as e:
         logger.error(f"Failed to trigger workflow: {e}")
         raise
@@ -76,7 +79,7 @@ def get_workflow_run(params: GetWorkflowRunParams) -> GetWorkflowRunResponse:
         logger.error(f"Failed to get workflow run details: {e}")
         raise
 
-@action_store.kubiya_action()
+# @action_store.kubiya_action()
 def cancel_workflow_run(params: CancelWorkflowRunParams) -> CancelWorkflowRunResponse:
     try:
         github = get_github_instance()
@@ -89,7 +92,7 @@ def cancel_workflow_run(params: CancelWorkflowRunParams) -> CancelWorkflowRunRes
         logger.error(f"Failed to cancel workflow run: {e}")
         raise
 
-@action_store.kubiya_action()
+# @action_store.kubiya_action()
 def track_workflow_run(params: TrackWorkflowRunParams) -> TrackWorkflowRunResponse:
     try:
         github = get_github_instance()
@@ -113,43 +116,43 @@ def track_workflow_run(params: TrackWorkflowRunParams) -> TrackWorkflowRunRespon
         logger.error(f"Failed to track workflow run: {e}")
         raise
 
-@action_store.kubiya_action()
-def list_workflow_files(params: ListWorkflowFilesParams) -> ListWorkflowFilesResponse:
-    try:
-        github = get_github_instance()
-        entity = get_entity(github)
-        repo = entity.get_repo(params.repo_name)
-
-        workflow_files = []
-        for workflow_file in repo.get_workflow_files():
-            workflow_file_model = WorkflowFileModel(
-                path=workflow_file.path,
-                size=workflow_file.size,
-                url=workflow_file.url
-            )
-            workflow_files.append(workflow_file_model)
-
-        return ListWorkflowFilesResponse(workflow_files=workflow_files)
-    except GithubException as e:
-        logger.error(f"Failed to list workflow files: {e}")
-        raise
-
-@action_store.kubiya_action()
-def get_workflow_file(params: GetWorkflowFileParams) -> GetWorkflowFileResponse:
-    try:
-        github = get_github_instance()
-        entity = get_entity(github)
-        repo = entity.get_repo(params.repo_name)
-        workflow_file = repo.get_workflow_file(params.file_path)
-        return GetWorkflowFileResponse(
-            path=workflow_file.path,
-            size=workflow_file.size,
-            url=workflow_file.url,
-            content=workflow_file.content
-        )
-    except GithubException as e:
-        logger.error(f"Failed to get workflow file: {e}")
-        raise
+# @action_store.kubiya_action()
+# def list_workflow_files(params: ListWorkflowFilesParams) -> ListWorkflowFilesResponse:
+#     try:
+#         github = get_github_instance()
+#         entity = get_entity(github)
+#         repo = entity.get_repo(params.repo_name)
+#
+#         workflow_files = []
+#         for workflow_file in repo.get_workflow_files():
+#             workflow_file_model = WorkflowFileModel(
+#                 path=workflow_file.path,
+#                 size=workflow_file.size,
+#                 url=workflow_file.url
+#             )
+#             workflow_files.append(workflow_file_model)
+#
+#         return ListWorkflowFilesResponse(workflow_files=workflow_files)
+#     except GithubException as e:
+#         logger.error(f"Failed to list workflow files: {e}")
+#         raise
+#
+# @action_store.kubiya_action()
+# def get_workflow_file(params: GetWorkflowFileParams) -> GetWorkflowFileResponse:
+#     try:
+#         github = get_github_instance()
+#         entity = get_entity(github)
+#         repo = entity.get_repo(params.repo_name)
+#         workflow_file = repo.get_workflow_file(params.file_path)
+#         return GetWorkflowFileResponse(
+#             path=workflow_file.path,
+#             size=workflow_file.size,
+#             url=workflow_file.url,
+#             content=workflow_file.content
+#         )
+#     except GithubException as e:
+#         logger.error(f"Failed to get workflow file: {e}")
+#         raise
 
 @action_store.kubiya_action()
 def list_workflow_job_runs(params: ListWorkflowJobRunsParams) -> ListWorkflowJobRunsResponse:
@@ -160,7 +163,7 @@ def list_workflow_job_runs(params: ListWorkflowJobRunsParams) -> ListWorkflowJob
         workflow_run = repo.get_workflow_run(params.workflow_run_id)
 
         job_runs = []
-        for job in workflow_run.get_jobs():
+        for job in workflow_run.jobs():
             job_run_model = WorkflowJobRunModel(
                 id=job.id,
                 name=job.name,
@@ -174,7 +177,7 @@ def list_workflow_job_runs(params: ListWorkflowJobRunsParams) -> ListWorkflowJob
         logger.error(f"Failed to list workflow job runs: {e}")
         raise
 
-@action_store.kubiya_action()
+# @action_store.kubiya_action()
 def get_workflow_job_run(params: GetWorkflowJobRunParams) -> GetWorkflowJobRunResponse:
     try:
         github = get_github_instance()
@@ -193,7 +196,7 @@ def get_workflow_job_run(params: GetWorkflowJobRunParams) -> GetWorkflowJobRunRe
         logger.error(f"Failed to get workflow job run details: {e}")
         raise
 
-@action_store.kubiya_action()
+# @action_store.kubiya_action()
 def download_workflow_artifact(params: DownloadWorkflowArtifactParams) -> DownloadWorkflowArtifactResponse:
     try:
         github = get_github_instance()
@@ -208,7 +211,7 @@ def download_workflow_artifact(params: DownloadWorkflowArtifactParams) -> Downlo
         logger.error(f"Failed to download workflow artifact: {e}")
         raise
 
-@action_store.kubiya_action()
+# @action_store.kubiya_action()
 def list_workflow_pull_requests(params: ListWorkflowPullRequestsParams) -> ListWorkflowPullRequestsResponse:
     try:
         github = get_github_instance()

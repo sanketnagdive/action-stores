@@ -1,7 +1,7 @@
 from pydantic import BaseModel
-
+from . import GitHubPlayGroundRepos,TEST_REPOS
 class CreateIssueParams(BaseModel):
-    repo_name: str
+    repo_name: GitHubPlayGroundRepos
     title: str
     body: str
 
@@ -10,14 +10,14 @@ class CreateIssueResponse(BaseModel):
     # Other fields from issue.raw_data
 
 class CloseIssueParams(BaseModel):
-    repo_name: str
+    repo_name: GitHubPlayGroundRepos
     issue_number: int
 
 class CloseIssueResponse(BaseModel):
     success: bool
 
 class GetIssueParams(BaseModel):
-    repo_name: str
+    repo_name: GitHubPlayGroundRepos
     issue_number: int
 
 class GetIssueResponse(BaseModel):

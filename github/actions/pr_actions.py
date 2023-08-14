@@ -45,7 +45,7 @@ def get_repo_pull_requests(params: GetRepoPullRequestsParams) -> GetRepoPullRequ
         logger.error(f"Failed to get pull requests: {e}")
         raise
 
-@action_store.kubiya_action()
+# @action_store.kubiya_action()
 def merge_pr(params: MergePRParams) -> MergePRResponse:
     try:
         github = get_github_instance()

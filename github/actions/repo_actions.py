@@ -16,7 +16,7 @@ from .. import action_store as action_store
 
 logger = logging.getLogger(__name__)
 
-@action_store.kubiya_action()
+# @action_store.kubiya_action()
 def create_repo(params: CreateRepoParams) -> CreateRepoResponse:
     try:
         github = get_github_instance()
@@ -27,7 +27,7 @@ def create_repo(params: CreateRepoParams) -> CreateRepoResponse:
         logger.error(f"Failed to create repository: {e}")
         raise
 
-@action_store.kubiya_action()
+# @action_store.kubiya_action()
 def delete_repo(params: DeleteRepoParams) -> DeleteRepoResponse:
     try:
         github = get_github_instance()
@@ -62,7 +62,7 @@ def create_pull_request(params: CreatePullRequestParams) -> CreatePullRequestRes
             title=params.title,
             body=params.body,
             head=params.branch_name,
-            base='master'
+            base='main'
         )
         return CreatePullRequestResponse(pull_request_url=pull_request.html_url, **pull_request.raw_data)
     except GithubException as e:
@@ -82,18 +82,7 @@ def get_repo_branches(params: GetRepoBranchesParams) -> GetRepoBranchesResponse:
         raise
 
 @action_store.kubiya_action()
-def list_repos(params: ListRepositoriesParams) -> ListRepositoriesResponse:
-    try:
-        github = get_github_instance()
-        entity = get_entity(github)
-        repos = [repo.name for repo in entity.get_repos()]
-        return ListRepositoriesResponse(repos=repos)
-    except GithubException as e:
-        logger.error(f"Failed to list repositories: {e}")
-        raise
-
-@action_store.kubiya_action()
-def list_repos(params: ListRepositoriesParams) -> ListRepositoriesResponse:
+def list_repos(params) -> ListRepositoriesResponse:
     try:
         github = get_github_instance()
         entity = get_entity(github)

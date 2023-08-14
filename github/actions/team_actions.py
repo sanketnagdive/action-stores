@@ -8,7 +8,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-@action_store.kubiya_action()
+# @action_store.kubiya_action()
 def get_teams(params: GetTeamsParams) -> GetTeamsResponse:
     try:
         github = get_github_instance()

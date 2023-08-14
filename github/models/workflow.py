@@ -1,9 +1,9 @@
 from typing import List
 from pydantic import BaseModel, Field
-
+from . import GitHubPlayGroundRepos,TEST_REPOS
 
 class ListWorkflowRunsParams(BaseModel):
-    repo_name: str = Field(..., description="Name of the repository")
+    repo_name: GitHubPlayGroundRepos = Field(..., description="Name of the repository")
 
 
 class WorkflowRunModel(BaseModel):
@@ -20,19 +20,19 @@ class ListWorkflowRunsResponse(BaseModel):
 
 
 class TriggerWorkflowParams(BaseModel):
-    repo_name: str = Field(..., description="Name of the repository")
-    workflow_id: str = Field(..., description="ID of the workflow to trigger")
-    event_type: str = Field(..., description="Type of the event to trigger the workflow")
+    repo_name: GitHubPlayGroundRepos = Field(..., description="Name of the repository")
+    workflow_id: str = "python-app.yml"
+    branch: str ="main"
 
 
 class TriggerWorkflowResponse(BaseModel):
-    workflow_run_id: str = Field(..., description="ID of the triggered workflow run")
-    workflow_run_url: str = Field(..., description="URL of the triggered workflow run")
-
+    # workflow_run_id: str = Field(..., description="ID of the triggered workflow run")
+    # workflow_run_url: str = Field(..., description="URL of the triggered workflow run")
+    success: bool = Field(..., description="Flag indicating if the workflow was triggered successfully")
 
 class GetWorkflowRunParams(BaseModel):
-    repo_name: str = Field(..., description="Name of the repository")
-    workflow_run_id: str = Field(..., description="ID of the workflow run to retrieve")
+    repo_name: GitHubPlayGroundRepos = Field(..., description="Name of the repository")
+    workflow_run_id: int = Field(..., description="ID of the workflow run to retrieve")
 
 
 class GetWorkflowRunResponse(BaseModel):
@@ -43,7 +43,7 @@ class GetWorkflowRunResponse(BaseModel):
 
 
 class CancelWorkflowRunParams(BaseModel):
-    repo_name: str = Field(..., description="Name of the repository")
+    repo_name: GitHubPlayGroundRepos = Field(..., description="Name of the repository")
     workflow_run_id: str = Field(..., description="ID of the workflow run to cancel")
 
 
@@ -52,7 +52,7 @@ class CancelWorkflowRunResponse(BaseModel):
 
 
 class TrackWorkflowRunParams(BaseModel):
-    repo_name: str = Field(..., description="Name of the repository")
+    repo_name: GitHubPlayGroundRepos = Field(..., description="Name of the repository")
     workflow_run_id: str = Field(..., description="ID of the workflow run to track")
     polling_interval: int = Field(5, description="Interval in seconds to poll the workflow run status")
 
@@ -66,7 +66,7 @@ class TrackWorkflowRunResponse(BaseModel):
 
 
 class ListWorkflowFilesParams(BaseModel):
-    repo_name: str = Field(..., description="Name of the repository")
+    repo_name: GitHubPlayGroundRepos = Field(..., description="Name of the repository")
 
 
 class WorkflowFileModel(BaseModel):
@@ -80,7 +80,7 @@ class ListWorkflowFilesResponse(BaseModel):
 
 
 class GetWorkflowFileParams(BaseModel):
-    repo_name: str = Field(..., description="Name of the repository")
+    repo_name: GitHubPlayGroundRepos = Field(..., description="Name of the repository")
     file_path: str = Field(..., description="Path of the workflow file to retrieve")
 
 
@@ -92,8 +92,8 @@ class GetWorkflowFileResponse(BaseModel):
 
 
 class ListWorkflowJobRunsParams(BaseModel):
-    repo_name: str = Field(..., description="Name of the repository")
-    workflow_run_id: str = Field(..., description="ID of the workflow run")
+    repo_name: GitHubPlayGroundRepos = Field(..., description="Name of the repository")
+    workflow_run_id: int = Field(..., description="ID of the workflow run")
 
 
 class WorkflowJobRunModel(BaseModel):
@@ -108,8 +108,8 @@ class ListWorkflowJobRunsResponse(BaseModel):
 
 
 class GetWorkflowJobRunParams(BaseModel):
-    repo_name: str = Field(..., description="Name of the repository")
-    workflow_run_id: str = Field(..., description="ID of the workflow run")
+    repo_name: GitHubPlayGroundRepos = Field(..., description="Name of the repository")
+    workflow_run_id: int = Field(..., description="ID of the workflow run")
     job_id: str = Field(..., description="ID of the job run to retrieve")
 
 
@@ -121,7 +121,7 @@ class GetWorkflowJobRunResponse(BaseModel):
 
 
 class DownloadWorkflowArtifactParams(BaseModel):
-    repo_name: str = Field(..., description="Name of the repository")
+    repo_name: GitHubPlayGroundRepos = Field(..., description="Name of the repository")
     workflow_run_id: str = Field(..., description="ID of the workflow run")
     artifact_name: str = Field(..., description="Name of the artifact to download")
 
@@ -131,7 +131,7 @@ class DownloadWorkflowArtifactResponse(BaseModel):
 
 
 class ListWorkflowPullRequestsParams(BaseModel):
-    repo_name: str = Field(..., description="Name of the repository")
+    repo_name: GitHubPlayGroundRepos = Field(..., description="Name of the repository")
     workflow_run_id: str = Field(..., description="ID of the workflow run")
 
 
@@ -171,45 +171,45 @@ class GetWorkflowFileContentRawResponse(BaseModel):
     content: bytes = Field(..., description="Raw content of the retrieved workflow file")
 
 
-class GetWorkflowFileContentRawParams(BaseModel):
-    repo_name: str = Field(..., description="Name of the repository")
-    file_path: str = Field(..., description="Path of the workflow file to retrieve raw content")
+# class GetWorkflowFileContentRawParams(BaseModel):
+#     repo_name: str = Field(..., description="Name of the repository")
+#     file_path: str = Field(..., description="Path of the workflow file to retrieve raw content")
 
 
-class GetWorkflowFileContentRawResponse(BaseModel):
-    content: bytes = Field(..., description="Raw content of the retrieved workflow file")
+# class GetWorkflowFileContentRawResponse(BaseModel):
+#     content: bytes = Field(..., description="Raw content of the retrieved workflow file")
 
-class ListWorkflowJobRunsParams(BaseModel):
-    repo_name: str = Field(..., description="Name of the repository")
-    workflow_run_id: str = Field(..., description="ID of the workflow run")
+# class ListWorkflowJobRunsParams(BaseModel):
+#     repo_name: str = Field(..., description="Name of the repository")
+#     workflow_run_id: str = Field(..., description="ID of the workflow run")
 
 
-class GetWorkflowJobRunResponse(BaseModel):
-    job_run_id: str = Field(..., description="ID of the job run")
-    job_name: str = Field(..., description="Name of the job")
-    status: str = Field(..., description="Status of the job run")
-    conclusion: str = Field(..., description="Conclusion of the job run")
+# class GetWorkflowJobRunResponse(BaseModel):
+#     job_run_id: str = Field(..., description="ID of the job run")
+#     job_name: str = Field(..., description="Name of the job")
+#     status: str = Field(..., description="Status of the job run")
+#     conclusion: str = Field(..., description="Conclusion of the job run")
+#
+# class GetWorkflowJobRunResponse(BaseModel):
+#     job_run_id: str = Field(..., description="ID of the job run")
+#     job_name: str = Field(..., description="Name of the job")
+#     status: str = Field(..., description="Status of the job run")
+#     conclusion: str = Field(..., description="Conclusion of the job run")
+#
+# class GetWorkflowJobRunResponse(BaseModel):
+#     job_run_id: str = Field(..., description="ID of the job run")
+#     job_name: str = Field(..., description="Name of the job")
+#     status: str = Field(..., description="Status of the job run")
+#     conclusion: str = Field(..., description="Conclusion of the job run")
 
-class GetWorkflowJobRunResponse(BaseModel):
-    job_run_id: str = Field(..., description="ID of the job run")
-    job_name: str = Field(..., description="Name of the job")
-    status: str = Field(..., description="Status of the job run")
-    conclusion: str = Field(..., description="Conclusion of the job run")
+# class DownloadWorkflowArtifactResponse(BaseModel):
+#     download_url: str = Field(..., description="URL to download the workflow artifact")
 
-class GetWorkflowJobRunResponse(BaseModel):
-    job_run_id: str = Field(..., description="ID of the job run")
-    job_name: str = Field(..., description="Name of the job")
-    status: str = Field(..., description="Status of the job run")
-    conclusion: str = Field(..., description="Conclusion of the job run")
+# class ListWorkflowPullRequestsParams(BaseModel):
+#     repo_name: str = Field(..., description="Name of the repository")
+#     workflow_run_id: str = Field(..., description="ID of the workflow run")
 
-class DownloadWorkflowArtifactResponse(BaseModel):
-    download_url: str = Field(..., description="URL to download the workflow artifact")
-
-class ListWorkflowPullRequestsParams(BaseModel):
-    repo_name: str = Field(..., description="Name of the repository")
-    workflow_run_id: str = Field(..., description="ID of the workflow run")
-
-class DownloadWorkflowArtifactParams(BaseModel):
-    repo_name: str = Field(..., description="Name of the repository")
-    workflow_run_id: str = Field(..., description="ID of the workflow run")
-    artifact_name: str = Field(..., description="Name of the artifact to download")
+# class DownloadWorkflowArtifactParams(BaseModel):
+#     repo_name: str = Field(..., description="Name of the repository")
+#     workflow_run_id: str = Field(..., description="ID of the workflow run")
+#     artifact_name: str = Field(..., description="Name of the artifact to download")

@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import List
+from . import GitHubPlayGroundRepos,TEST_REPOS
 
 class ListRepositoriesParams(BaseModel):
     pass
@@ -22,16 +23,16 @@ class DeleteRepoResponse(BaseModel):
     success: bool
 
 class GetRepoFilesParams(BaseModel):
-    repo_name: str
+    repo_name: GitHubPlayGroundRepos
 
 class GetRepoFilesResponse(BaseModel):
     files: list
 
 class CreatePullRequestParams(BaseModel):
-    repo_name: str
+    repo_name: GitHubPlayGroundRepos
     title: str
     body: str
-    branch_name: str
+    branch_name: str="main2"
 
 class CreatePullRequestResponse(BaseModel):
     pull_request_url: str
@@ -44,13 +45,13 @@ class ListRepositoriesResponse(BaseModel):
     repos: List[str]
 
 class FindRepositoriesParams(BaseModel):
-    pattern: str
+    pattern: str=TEST_REPOS
 
 class FindRepositoriesResponse(BaseModel):
     repos: List[str]
 
 class GetRepoBranchesParams(BaseModel):
-    repo_name: str
+    repo_name: GitHubPlayGroundRepos
 
 class GetRepoBranchesResponse(BaseModel):
     branches: List[str]

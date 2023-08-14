@@ -1,14 +1,15 @@
 from pydantic import BaseModel
 from typing import List
+from . import GitHubPlayGroundRepos,TEST_REPOS
 
 class ListOpenPRsParams(BaseModel):
-    repo_name: str
+    repo_name: GitHubPlayGroundRepos
 
 class ListOpenPRsResponse(BaseModel):
     prs: List[str]
 
 class GetPRDetailsParams(BaseModel):
-    repo_name: str
+    repo_name: GitHubPlayGroundRepos
     pr_number: int
 
 class GetPRDetailsResponse(BaseModel):
@@ -18,7 +19,7 @@ class GetPRDetailsResponse(BaseModel):
     state: str
 
 class GetRepoPullRequestsParams(BaseModel):
-    repo_name: str
+    repo_name: GitHubPlayGroundRepos
     state: str  # State can be "open", "closed", or "all"
 
 class PullRequestModel(BaseModel):
@@ -35,7 +36,7 @@ class GetRepoPullRequestsResponse(BaseModel):
     prs: List[PullRequestModel]
 
 class MergePRParams(BaseModel):
-    repo_name: str
+    repo_name: GitHubPlayGroundRepos
     pr_number: int
     commit_message: str
     merge_method: str
