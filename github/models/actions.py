@@ -227,8 +227,7 @@ class GetOrgSecretResponse(BaseModel):
 class CreateUpdateOrgSecretParams(BaseModel):
     org: str
     secret_name: str
-    encrypted_value: Optional[str]
-    key_id: Optional[str]
+    encrypted_value: str
     visibility: str
     selected_repository_ids: Optional[List[int]]
 
