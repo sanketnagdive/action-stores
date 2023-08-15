@@ -1,17 +1,17 @@
 from ..models.ecr_models import (
     CreateRepositoryRequest,
     CreateRepositoryResponse,
-    DeleteRepositoryRequest,
-    DeleteRepositoryResponse,
     DescribeRepositoriesRequest,
     DescribeRepositoriesResponse,
     ListImagesRequest,
     ListImagesResponse,
     FindImagesRequest,
     FindImagesResponse,
+    ListECRRepositoriesRequest,
+    ListECRRepositoriesResponse
 )
 from ..main_store import store
-from ..aws_wrapper import get_resource
+from ..aws_wrapper import get_client
 
 @store.kubiya_action()
 def create_repository(request: CreateRepositoryRequest) -> CreateRepositoryResponse:
@@ -24,26 +24,10 @@ def create_repository(request: CreateRepositoryRequest) -> CreateRepositoryRespo
     Returns:
         CreateRepositoryResponse: The response containing the details of the created repository.
     """
-    ecr = get_resource("ecr")
+    ecr = get_client("ecr")
     response = ecr.create_repository(repositoryName=request.repository_name)
-    repository_arn = response["repository"]["repositoryArn"]
-    return CreateRepositoryResponse(repository_name=request.repository_name, repository_arn=repository_arn)
-
-
-@store.kubiya_action()
-def delete_repository(request: DeleteRepositoryRequest) -> DeleteRepositoryResponse:
-    """
-    Deletes an ECR repository.
-
-    Args:
-        request (DeleteRepositoryRequest): The request containing the name of the repository to delete.
-
-    Returns:
-        DeleteRepositoryResponse: The response indicating the deletion of the repository.
-    """
-    ecr = get_resource("ecr")
-    response = ecr.delete_repository(repositoryName=request.repository_name)
-    return DeleteRepositoryResponse(repository_name=request.repository_name)
+    return response
+    # return CreateRepositoryResponse(repository_name=request.repository_name, repository_arn=repository_arn)
 
 
 @store.kubiya_action()
@@ -57,7 +41,7 @@ def describe_repositories(request: DescribeRepositoriesRequest) -> DescribeRepos
     Returns:
         DescribeRepositoriesResponse: The response containing the list of repositories.
     """
-    ecr = get_resource("ecr")
+    ecr = get_client("ecr")
     response = ecr.describe_repositories(repositoryNames=request.repository_names)
     repositories = response["repositories"]
     return DescribeRepositoriesResponse(repositories=repositories)
@@ -74,7 +58,7 @@ def list_images(request: ListImagesRequest) -> ListImagesResponse:
     Returns:
         ListImagesResponse: The response containing the list of images.
     """
-    ecr = get_resource("ecr")
+    ecr = get_client("ecr")
     response = ecr.list_images(
         repositoryName=request.repository_name,
         filterTags=request.filter_tags,
@@ -96,7 +80,7 @@ def find_images(request: FindImagesRequest) -> FindImagesResponse:
     Returns:
         FindImagesResponse: The response containing the list of matched images.
     """
-    ecr = get_resource("ecr")
+    ecr = get_client("ecr")
     response = ecr.describe_repositories()
     repositories = response["repositories"]
     matched_images = []
@@ -116,3 +100,20 @@ def find_images(request: FindImagesRequest) -> FindImagesResponse:
                 })
 
     return FindImagesResponse(matched_images=matched_images)
+
+
+@store.kubiya_action()
+def list_ecr_repositories(request: ListECRRepositoriesRequest) -> ListECRRepositoriesResponse:
+    """
+    List ECR repositories using Boto3.
+
+    Args:
+        request (ListECRRepositoriesRequest): The request (no parameters needed).
+
+    Returns:
+        ListECRRepositoriesResponse: The response containing the list of ECR repository names.
+    """
+    ecr_client = get_client("ecr")
+    response = ecr_client.describe_repositories()
+    repositories = [repo["repositoryName"] for repo in response.get("repositories", [])]
+    return ListECRRepositoriesResponse(repository_names=repositories)

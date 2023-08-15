@@ -44,3 +44,11 @@ class FindImagesRequest(BaseModel):
 
 class FindImagesResponse(BaseModel):
     matched_images: List[dict]
+
+
+class ListECRRepositoriesRequest(BaseModel):
+    pass
+
+
+class ListECRRepositoriesResponse(BaseModel):
+    repository_names: List[str]

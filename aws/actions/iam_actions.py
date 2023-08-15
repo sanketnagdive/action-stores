@@ -1,8 +1,6 @@
 from ..models.iam_models import (
     CreateUserRequest,
     CreateUserResponse,
-    DeleteUserRequest,
-    DeleteUserResponse,
     ListUsersRequest,
     ListUsersResponse,
     CreateAccessKeyRequest,
@@ -29,22 +27,6 @@ def create_user(request: CreateUserRequest) -> CreateUserResponse:
     response = iam.create_user(UserName=request.username)
     user_arn = response["User"]["Arn"]
     return CreateUserResponse(username=request.username, arn=user_arn)
-
-
-@store.kubiya_action()
-def delete_user(request: DeleteUserRequest) -> DeleteUserResponse:
-    """
-    Deletes an IAM user.
-
-    Args:
-        request (DeleteUserRequest): The request containing the username of the user to delete.
-
-    Returns:
-        DeleteUserResponse: The response indicating the deletion of the user.
-    """
-    iam = get_resource("iam")
-    response = iam.delete_user(UserName=request.username)
-    return DeleteUserResponse(username=request.username)
 
 
 @store.kubiya_action()

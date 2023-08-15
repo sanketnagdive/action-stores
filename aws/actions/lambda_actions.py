@@ -1,8 +1,6 @@
 from ..models.lambda_models import (
     CreateFunctionRequest,
     CreateFunctionResponse,
-    DeleteFunctionRequest,
-    DeleteFunctionResponse,
     GetFunctionRequest,
     GetFunctionResponse,
     ListFunctionsRequest,
@@ -27,22 +25,6 @@ def create_function(request: CreateFunctionRequest) -> CreateFunctionResponse:
     response = lambda_client.create_function(**request.dict(exclude_none=True))
     function_name = response["FunctionName"]
     return CreateFunctionResponse(function_name=function_name)
-
-
-@store.kubiya_action()
-def delete_function(request: DeleteFunctionRequest) -> DeleteFunctionResponse:
-    """
-    Deletes an AWS Lambda function.
-
-    Args:
-        request (DeleteFunctionRequest): The request containing the name of the function to delete.
-
-    Returns:
-        DeleteFunctionResponse: The response indicating the deletion of the function.
-    """
-    lambda_client = get_client("lambda")
-    response = lambda_client.delete_function(FunctionName=request.function_name)
-    return DeleteFunctionResponse(function_name=request.function_name)
 
 
 @store.kubiya_action()

@@ -1,14 +1,18 @@
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 
+
+class VpcConfig(BaseModel):
+    subnetIds: List[str] = ["subnet-12345678", "subnet-87654321"]  # Placeholder subnet IDs
+    securityGroupIds: List[str] = ["sg-12345678"]  # Placeholder security group IDs
+    endpointPublicAccess: bool = True
+    endpointPrivateAccess: bool = False
+    publicAccessCidrs: List[str] = ["0.0.0.0/0"]
 
 class CreateClusterRequest(BaseModel):
     name: str
     roleArn: str
-    version: str = None
-    resourcesVpcConfig: dict = None
-    logging: dict = None
-
+    resourcesVpcConfig: VpcConfig = VpcConfig()
 
 class CreateClusterResponse(BaseModel):
     cluster_name: str
@@ -31,8 +35,7 @@ class DescribeClusterResponse(BaseModel):
 
 
 class ListClustersRequest(BaseModel):
-    max_results: int = None
-    next_token: str = None
+    pass
 
 
 class ListClustersResponse(BaseModel):

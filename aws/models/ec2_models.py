@@ -1,20 +1,12 @@
-from pydantic import BaseModel
-from typing import List
-
-
-class TerminateInstanceRequest(BaseModel):
-    instance_id: str
-
-
-class TerminateInstanceResponse(BaseModel):
-    message: str
+from pydantic import BaseModel, constr
+from typing import List, Optional
 
 
 class CreateInstanceRequest(BaseModel):
-    image_id: str
-    instance_type: str
-    min_count: int
-    max_count: int
+    image_id: str = "ami-df5de72bdb3b"
+    instance_type: constr(regex=r'^(t2\.micro|t2\.small|m4\.large)$')  # Add more allowed instance types
+    max_count: int = 1
+    min_count: int = 1
 
 
 class CreateInstanceResponse(BaseModel):
@@ -22,9 +14,26 @@ class CreateInstanceResponse(BaseModel):
 
 
 class ListInstancesRequest(BaseModel):
-    instance_ids: List[str] = None
-    instance_types: List[str] = None
+    pass
+    # instance_ids: Optional[List[str]] = None
+    # instance_types: Optional[List[str]] = None
 
 
 class ListInstancesResponse(BaseModel):
     instances: List[dict]
+
+
+class RebootInstanceRequest(BaseModel):
+    instance_id: str
+
+
+class RebootInstanceResponse(BaseModel):
+    message: str
+
+
+class DescribeSecurityGroupsRequest(BaseModel):
+    instance_id: str
+
+
+class DescribeSecurityGroupsResponse(BaseModel):
+    security_groups: List[dict]
