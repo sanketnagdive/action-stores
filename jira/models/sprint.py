@@ -4,7 +4,7 @@ from typing import List
 
 class SprintParams(BaseModel):
     name: str
-    board_id: constr(regex=r'^(2)$') = '2'
+    board_id: str = 3
     start_date: str
     end_date: str
 
@@ -32,7 +32,7 @@ class AddIssueToSprintResponse(BaseModel):
     success: bool
 
 class GetAllSprintsParams(BaseModel):
-    board_id: constr(regex=r'^(2)$') = '2'
+    board_id: str = 3
 
 class SprintData(BaseModel):
     id: int

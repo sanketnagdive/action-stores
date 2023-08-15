@@ -7,12 +7,12 @@ from .. import action_store as action_store
 @action_store.kubiya_action()
 def run_jql(request: RunJQLParams) -> RunJQLResponse:
     """
-    Runs a JQL query and returns the issues for the project with key DEV
+    Runs a JQL query and returns the issues for the project with key KUB
     """
     jira = get_jira_instance()
 
-    # Modify the JQL query to include the project key 'DEV'
-    modified_jql_query = f"project = DEV AND ({request.jql_query})"
+    # Modify the JQL query to include the project key 'KUB'
+    modified_jql_query = f"project = KUB AND ({request.jql_query})"
 
     raw_response = jira.jql(modified_jql_query)
     raw_issues = raw_response['issues']

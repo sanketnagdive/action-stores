@@ -22,7 +22,7 @@ def create_issue(request: CreateIssueParams) -> CreateIssueResponse:
     jira = get_jira_instance()
     issue = jira.issue_create(
         fields={
-            "project": {"key": "DEV"},
+            "project": {"key": "KUB"},
             "issuetype": {"name": request.issue_type_name},
             "summary": request.summary,
             "description": request.description,
@@ -89,5 +89,5 @@ def get_all_issues(request: GetAllIssuesParams) -> GetAllIssuesResponse:
     Gets all issues in a project and returns the issue key and URL
     """
     jira = get_jira_instance()
-    issues = jira.search_issues('project=DEV')
+    issues = jira.search_issues('project=KUB')
     return GetAllIssuesResponse(issues=issues)
