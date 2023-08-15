@@ -68,7 +68,7 @@ class BuildConsoleLogsResponse(BaseModel):
 
 class TriggerJobRequest(BaseModel):
     job_name: str
-    parameters: Optional[str] = None
+    parameters: Optional[dict] = None
 
 class TriggerJobResponse(BaseModel):
     success: bool
@@ -182,7 +182,13 @@ def get_latest_build_number(job_name: str) -> Optional[int]:
 @action_store.kubiya_action()
 def trigger_job(request: TriggerJobRequest) -> TriggerJobResponse:
     logger.info(f"Triggering job {request.job_name}")
-    endpoint = f"/job/{request.job_name}/buildWithParameters{request.parameters}" if request.parameters else f"/job/{request.job_name}/build"
+
+    endpoint = f"/job/{request.job_name}/buildWithParameters" if request.parameters else f"/job/{request.job_name}/build"
+
+    if request.parameters:
+        # Format parameters as key-value pairs separated by '&' if more than one parameter is passed
+        param_string = '&'.join([f"{key}={value}" for key, value in request.parameters.items()])
+        endpoint += '?' + param_string
     try:
         response = post_wrapper_full_response(endpoint)
         if response.status_code != 201:
