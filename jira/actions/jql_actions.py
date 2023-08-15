@@ -3,13 +3,18 @@ from ..jira_wrapper import get_jira_instance
 from .issue_actions import get_jira_url
 from .. import action_store as action_store
 
+
 @action_store.kubiya_action()
 def run_jql(request: RunJQLParams) -> RunJQLResponse:
     """
-    Runs a JQL query and returns the issues
+    Runs a JQL query and returns the issues for the project with key DEV
     """
     jira = get_jira_instance()
-    raw_response = jira.jql(request.jql_query)
+
+    # Modify the JQL query to include the project key 'DEV'
+    modified_jql_query = f"project = DEV AND ({request.jql_query})"
+
+    raw_response = jira.jql(modified_jql_query)
     raw_issues = raw_response['issues']
 
     # Limit the issues to max_results

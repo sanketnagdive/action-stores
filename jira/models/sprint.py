@@ -1,10 +1,10 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, constr
 from typing import List
 
 
 class SprintParams(BaseModel):
     name: str
-    board_id: int
+    board_id: constr(regex=r'^(2)$') = '2'
     start_date: str
     end_date: str
 
@@ -32,7 +32,7 @@ class AddIssueToSprintResponse(BaseModel):
     success: bool
 
 class GetAllSprintsParams(BaseModel):
-    board_id: int
+    board_id: constr(regex=r'^(2)$') = '2'
 
 class SprintData(BaseModel):
     id: int
@@ -41,3 +41,6 @@ class SprintData(BaseModel):
 
 class GetAllSprintsResponse(BaseModel):
     sprints: List[SprintData]
+
+class GetBoardIDRequest(BaseModel):
+    board_name: str

@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field
 from enum import Enum
 from typing import Any, List, Optional
+
 class JiraField(Enum):
     ASSIGNEE = "fields.assignee.displayName"
     KEY = "key"

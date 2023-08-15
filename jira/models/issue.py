@@ -1,11 +1,10 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, constr
 from .common import SimpleResponse
-from typing import List
+from typing import List, Optional
 
 
 class CreateIssueParams(BaseModel):
-    project_key: str
-    issue_type_name: str
+    issue_type_name: constr(regex=r'^(Bug|Task|Story|Epic)$')
     summary: str
     description: str
 
@@ -41,28 +40,15 @@ class CommentIssueResponse(BaseModel):
     author: dict
     created: str
 
-class LinkIssuesParams(BaseModel):
-    issue_key_1: str
-    issue_key_2: str
-    link_type_name: str
-
-class LinkIssuesResponse(SimpleResponse):
-    pass
-
-
 class UpdateIssueParams(BaseModel):
     issue_key: str
-    update_dict: dict
+    summary: Optional[str] = None
+    description: Optional[str] = None
 
 class UpdateIssueResponse(BaseModel):
     success: bool
+    message: str
 
 class AssignIssueParams(BaseModel):
     issue_key: str
-    assignee_name: str
-
-class DeleteIssueParams(BaseModel):
-    issue_key: str
-
-class DeleteIssueResponse(BaseModel):
-    success: bool
+    assignee_name: constr(regex=r'^(Michael Gonzalez)$') = 'Michael Gonzalez'
