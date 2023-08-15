@@ -27,11 +27,6 @@ def get_pipeline_test_report(input: GetPipelineTestReportInput):
     return SinglePipeline(pipe=response)
 
 @action_store.kubiya_action()
-def get_pipeline_test_report_summary(input: GetPipelineTestReportSummaryInput):
-    response = get_wrapper(endpoint=f'/projects/{input.id}/pipelines/{input.pipeline_id}/test_report_summary')
-    return SinglePipeline(pipe=response)
-
-@action_store.kubiya_action()
 def get_latest_pipeline(input: GetLatestPipelineInput):
     response = get_wrapper(endpoint=f'/projects/{input.id}/pipelines/latest', args=input.dict(exclude_none=True))
     return SinglePipeline(pipe=response)    

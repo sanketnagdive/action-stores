@@ -11,9 +11,9 @@ from .actions import(
      dora4_metrics, 
      project_statistics,
      environments,
-     #repositories,
-     # repository_files,
-     # runners,
+     repositories,
+     repository_files,
+     runners,
      # variables_group,
      # variables_project,
      merge_requests

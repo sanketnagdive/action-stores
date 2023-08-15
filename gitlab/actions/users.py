@@ -37,21 +37,6 @@ def get_current_user(input: RequestInput):
     return SingleDict(response=response)
 
 @action_store.kubiya_action()
-def get_current_user_status(input: RequestInput):
-    response = get_wrapper(endpoint='/user/status')
-    return SingleDict(response=response)
-
-@action_store.kubiya_action()
-def get_user_status(input: GetUserInput):
-    response = get_wrapper(endpoint=f'/users/{input.id}/status')
-    return SingleDict(response=response)
-
-@action_store.kubiya_action()
-def set_user_status(input: SetUserStatusInput):
-    response = put_wrapper(endpoint='/user/status', data=input.dict(exclude_none=True))
-    return SingleDict(response=response)
-
-@action_store.kubiya_action()
 def get_user_preferences(RequestInput):
     response = get_wrapper(endpoint='/user/preferences')
     return SingleDict(response=response)

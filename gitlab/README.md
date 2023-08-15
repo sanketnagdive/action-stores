@@ -1,35 +1,16 @@
 # GitLab API
 We use the GitLab REST API for all of our action stores: https://docs.gitlab.com/ee/api/repositories.html#merge-base
 
-# Gen2 Structure
-Modules
+# Prompting Tips
+1. The GitLab REST API is useful for knowing which parameter inputs are required. Usually, the API that Kubi calls just requires the Group/Project ID. 
+2. Kubi can sometimes send unneeded parameters as "", or generate a default value which may lead to errors. When prompting, tell Kubi "Don't send anything other than (needed parameters)."
+    - If it repeatedly puts an incorrect parameter, you can try specifying a default value in the Pydantic model using Field()
 
-# Testing
-
-## Bundling, Deploying
-1. Secrets can be added via the Kubiya UI at https://app.kubiya.ai
-2. We bundle using ttl.sh, an ephemeral Docker container
-    ``` kubiya-cli action-store bundle -n action-store-gitlab -p action-store-gitlab -i ttl.sh/action-store-gitlab:24h ```
-3. We deploy using our test team runner (teamrunner)
-    ``` kubiya-cli action-store deploy -n action-store-gitlab -r teamrunner -i ttl.sh/action-store-gitlab:24h```
-4. Then, build a test workflow in the Kubiya platform to deploy the working code, see any issues.
-
-## Errors and Logs
-1. ssh using ``` ssh -i "<keypem>" <address of EC2 instance>```
-2. Verify you're in the right pod: kind-team using ```kubectl config current-context ```
-3. To see pods, use ```kubectl get pods -n openfaas-fn ```
-4. To get logs, use ```kubectl logs -n openfaas-fn (action store pod name from previous line) ```
-
-
-## Tests
-* ``` betterclassnames.py ``` : (discontinued) A way to rename the pydantic class inputs to functions based on the action store name
-    *   I'm currently using ``` projectstest.py ```  as my testing module for renaming class names automatically
-* ``` repeatedclasses.py ``` : Double-check if you accidentally named two pydantic classes the same thing
-    * Be aware of which directory you run this in
-
-
-# Coding Notes 
-## Known Limitations and Issues
-* **Uploading Files**: I'm not sure how the current UI interfaces to allow file uploads - feel free to slack me if you understand. 
-* **Visual Review Discussions API**: This is planned for removal in May 2022 (Gitlab 17.0)
-
+# Notes on Testing and Common Bugs
+1. If ttl.sh is the Docker registry you use, there is often a delay between building using kubiya-cli and ttl.sh receiving the new image (<5 mins). 
+2. You may need to restart the pod 3-4 times before it loads all the actions. 
+3. Sometimes, the action store will get stuck on pending. If it still hasn't loaded actions after 5-10 minutes, there may be a syntax issue not caught in the building process. 
+    1. Delete the action store. 
+    2. Check in Kubernetes if the openfaas deployment and pod for your action store has been deleted yet. 
+    3. Deploy the action store with your changes. 
+4. There appears to be an upper limit of about 125 action stores. Past this limit, the pod will stay stuck on pending. 

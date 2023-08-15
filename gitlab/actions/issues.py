@@ -51,21 +51,6 @@ def move_issue(input: MoveIssueInput):
     return Issues(issues=response)
 
 @action_store.kubiya_action()
-def clone_issue(input: CloneIssueInput):
-    response =  post_wrapper(endpoint=f'/projects/{input.id}/issues/{input.issue_iid}/clone', data=input.dict())
-    return Issues(issues=response)
-
-@action_store.kubiya_action()
-def subscribe_issue(input: SubscribeIssueInput):
-    response =  post_wrapper(endpoint=f'/projects/{input.id}/issues/{input.issue_iid}/subscribe')
-    return Issues(issues=response)
-
-@action_store.kubiya_action()
-def unsubscribe_issue(input: UnsubscribeIssueInput):
-    response =  post_wrapper(endpoint=f'/projects/{input.id}/issues/{input.issue_iid}/unsubscribe')
-    return Issues(issues=response)
-
-@action_store.kubiya_action()
 def create_todo_item(input: CreateTodoItemInput):
     response =  post_wrapper(endpoint=f'/projects/{input.id}/issues/{input.issue_iid}/todo')
     return Issues(issues=response)
@@ -78,11 +63,6 @@ def promote_issue_to_epic(input: PromoteIssueToEpicInput):
 @action_store.kubiya_action()
 def set_time_estimate_for_an_issue(input: TimeEstimateForAnIssue):
     response =  post_wrapper(endpoint=f'/projects/{input.id}/issues/{input.issue_iid}/time_estimate', args=input.dict(exclude_none=True))
-    return Issues(issues=response)
-
-@action_store.kubiya_action()
-def reset_time_estimate_for_an_issue(input: IssueIdentifier):
-    response =  post_wrapper(endpoint=f'/projects/{input.id}/issues/{input.issue_iid}/reset_time_estimate')
     return Issues(issues=response)
 
 @action_store.kubiya_action()
@@ -103,11 +83,6 @@ def get_time_tracking_stats(input: IssueIdentifier):
 @action_store.kubiya_action()
 def list_related_merge_requests(input: IssueIdentifier):
     response =  get_wrapper(endpoint=f'/projects/{input.id}/issues/{input.issue_iid}/related_merge_requests')
-    return Issues(issues=response)
-
-@action_store.kubiya_action()
-def list_merge_requests_that_close_issue(input: IssueIdentifier):
-    response =  get_wrapper(endpoint=f'/projects/{input.id}/issues/{input.issue_iid}/closed_by')
     return Issues(issues=response)
 
 @action_store.kubiya_action()
