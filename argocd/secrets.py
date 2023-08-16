@@ -1,12 +1,8 @@
 from . import action_store
 
-
-
 def get_user():
-    return os.environ.get("ARGO_USER", "michael")
-
+    return action_store.secrets.get("ARGO_USER")
 def get_server():
-    return os.environ.get("ARGO_SERVER", "https://argocd-int.dev.kubiya.ai/")
-
+    return action_store.secrets.get("ARGO_SERVER")
 def get_password():
     return action_store.secrets.get("ARGO_PASS")
