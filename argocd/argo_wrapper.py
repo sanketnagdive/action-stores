@@ -1,19 +1,19 @@
 import requests
-from typing import Dict, Any, Optional
+from typing import Any
 from .secrets import *
 
 def get_token() -> str:
     ARGO_USER = get_user()
     ARGO_PASS = get_password()
     ARGO_SERVER = get_server()
-    payload = {"username": f"{ARGO_USER}", "password": f"{ARGO_PASS}!"}
+    payload = {"username": f"{ARGO_USER}", "password": f"{ARGO_PASS}"}
     headers = {"Content-Type": "application/json"}
     response = requests.post(f"{ARGO_SERVER}/api/v1/session", json=payload, headers=headers, verify=False)
     response.raise_for_status()
     token = response.json()["token"]
     return token
 
-def get_wrapper(endpoint: str) -> Any:
+def get_wrapper(endpoint: str, params: dict = None) -> Any:
     token = get_token()
     ARGO_SERVER = get_server()
     headers = {
@@ -21,22 +21,22 @@ def get_wrapper(endpoint: str) -> Any:
         "Content-Type": "application/json",
         "Accept": "application/json"
     }
-    response = requests.get(f"{ARGO_SERVER}{endpoint}", headers=headers, verify=False)
+    response = requests.get(f"{ARGO_SERVER}/api/v1{endpoint}",  params=params, headers=headers, verify=False)
     response.raise_for_status()
     return response.json()
 
-def post_wrapper(endpoint: str, args: Dict = None) -> Any:
-    token = get_token()
-    ARGO_SERVER = get_server()
+# def post_wrapper(endpoint: str, args: Dict = None) -> Any:
+#     token = get_token()
+#     ARGO_SERVER = get_server()
 
-    headers = {
-        "Authorization": f"Bearer {token}",
-        "Content-Type": "application/json",
-        "Accept": "application/json"
-    }
-    response = requests.post(f"{ARGO_SERVER}/api/v1{endpoint}", json=args, headers=headers, verify=False)
-    response.raise_for_status()
-    return response.json()
+#     headers = {
+#         "Authorization": f"Bearer {token}",
+#         "Content-Type": "application/json",
+#         "Accept": "application/json"
+#     }
+#     response = requests.post(f"{ARGO_SERVER}/api/v1{endpoint}", json=args, headers=headers, verify=False)
+#     response.raise_for_status()
+#     return response.json()
 
 # def get_wrapper(endpoint: str, args: Optional[Dict[str, Any]] = None):
 #     host,token = get_secrets()

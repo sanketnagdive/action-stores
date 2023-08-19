@@ -3,21 +3,21 @@ from .. import action_store as action_store
 from ..argo_wrapper import *
 
 @action_store.kubiya_action()
-def list_accounts(ListAccounts):
-    return get_wrapper("/api/v1/account")
+def list_accounts(input: ListAccounts):
+    return get_wrapper("/account")
 
-# @action_store.kubiya_action()
-# def get_accounts(_:Any=None) -> List:
-#     return get_wrapper("/account")
+@action_store.kubiya_action()
+def get_accounts(input: GetAccounts):
+    return get_wrapper(f"/account/{input.name}")
 
-# @action_store.kubiya_action()
-# def get_all_apps(_:Any=None) -> List:
-#     return get_wrapper("/applications")
+@action_store.kubiya_action()
+def list_applications(input: ListApplicationsInput):
+    params = input.dict(exclude_none=True)
+    return get_wrapper("/api/v1/applications", params=params)
 
-# @action_store.kubiya_action()
-# def sync_app(params: Dict) -> str:
-#     app_name = params.pop("app_name")
-#     return post_wrapper(f"/applications/{app_name}/sync", args=params)
+@action_store.kubiya_action()
+def sync_app(input: SyncName) -> str:
+    return get_wrapper(f"/api/v1/applications{input.name}/sync")
 
 # @action_store.kubiya_action()
 # def restart_service(params:dict):
@@ -105,7 +105,11 @@ def list_accounts(ListAccounts):
 #     }
 #     return requests.delete(f"{ARGO_SERVER}/api/v1/projects/{project_name}")
 
-# # Get all projects
-# @action_store.kubiya_action()
-# def get_all_projects(_:Any=None) -> List:
-#     return get_wrapper("/projects")
+
+@action_store.kubiya_action()
+def list_projects(input: ListProjects):
+    return get_wrapper("/projects")
+
+@action_store.kubiya_action()
+def list_projects_by_name(input: ListProjectsName):
+    return get_wrapper(f"/projects/{input.name}/")

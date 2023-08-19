@@ -19,4 +19,4 @@ import kubiya
 #      merge_requests
 # )
 
-from actions import example
+from .actions import accountservice
