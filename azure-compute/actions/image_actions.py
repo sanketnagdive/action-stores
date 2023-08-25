@@ -22,7 +22,7 @@ def create_or_update_azure_image(params: ImageCreationParameters) -> Union[Image
                                         }
                                 }
                 }
-    endpoint = f"https://management.azure.com/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/images/{imageName}"
+    endpoint = f"subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/images/{imageName}"
     api_version = ""
     response_data = put_wrapper(endpoint, subscriptionId, api_version, data=image_data)
     return ImageModel(**response_data)
@@ -32,7 +32,7 @@ def get_azure_images(params: ImageCreationParameters) -> Union[ImageModel, dict]
     subscriptionId = params.subscriptionId
     resourceGroupName = params.resourceGroupName
     imageName = params.imageName
-    endpoint = f"https://management.azure.com/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/images/{imageName}"
+    endpoint = f"subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/images/{imageName}"
     api_version = "2022-11-01"
 
     response_data = get_wrapper(endpoint, params.subscriptionId, api_version)
@@ -41,4 +41,18 @@ def get_azure_images(params: ImageCreationParameters) -> Union[ImageModel, dict]
 
 @action_store.kubiya_action()
 def listall_azure_images(params: ImageListParameters) -> Union[ImageListModel, dict]:
-    subscriptionId = params.subscriptionId
+    #subscriptionId = params.subscriptionId
+    endpoint = f"subscriptions/{params.subscriptionId}/providers/Microsoft.Compute/images"
+    api_version = "2022-11-01"
+    response_data = get_wrapper(endpoint, params.subscriptionId, api_version)
+    image_list = response_data.get('value', [])
+    return [ImageListModel(**image) for image in image_list]
+
+def list_by_rg_azure_images(params: ImageListParameters) -> Union[ImageListModel, dict]:
+    #subscriptionId = params.subscriptionId
+    endpoint = f"subscriptions/{params.subscriptionId}/resourceGroups/{params.resourceGroupName}/providers/Microsoft.Compute/images"
+    api_version = "2022-11-01"
+    response_data = get_wrapper(endpoint, params.subscriptionId, api_version)
+    image_list = response_data.get('value', [])
+    return [ImageListModel(**image) for image in image_list]
+    
