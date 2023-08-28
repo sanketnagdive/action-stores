@@ -9,6 +9,11 @@ class ImageCreationParameters(BaseModel):
     location: str
     
 class ImageModel(BaseModel):
+    id: str
+    type: str
+    name: str
+    location: str
+    tags: Optional[dict] = {}
     properties: dict
     
 class ImageListParameters(BaseModel):
